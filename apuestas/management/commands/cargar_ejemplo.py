@@ -65,9 +65,9 @@ def viernes_de_la_fecha_24():
 
 # (usuario, habilidad 0..1, probabilidad de apostar en un partido)
 USUARIOS = [
-    ('goleador_datos', 0.55, 0.9), ('lacuotajusta', 0.45, 0.8), ('analisis_ohiggins', 0.40, 0.7),
+    ('si_te_tinca', 0.55, 0.9), ('lacuotajusta', 0.45, 0.8), ('analisis_ohiggins', 0.40, 0.7),
     ('picks_del_sur', 0.35, 0.5), ('tercer_tiempo', 0.20, 0.95), ('xg_chile', 0.30, 0.35),
-    ('banca_fria', 0.05, 0.6), ('el_profe_ricky', 0.0, 0.5), ('novato_2026', 0.0, 0.1),
+    ('experimentar', 0.05, 0.6), ('el_profe_ricky', 0.0, 0.5), ('novato_2026', 0.0, 0.1),
 ]
 
 
