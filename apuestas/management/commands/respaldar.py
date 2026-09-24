@@ -27,7 +27,7 @@ class Command(BaseCommand):
     help = 'Respalda la base de datos y las fotos en un archivo comprimido.'
 
     def add_arguments(self, parser):
-        parser.add_argument('--carpeta', default=str(Path.home() / 'respaldos'),
+        parser.add_argument('--carpeta', default=str(settings.RESPALDOS_DIR),
                             help='Dónde guardar los respaldos (por defecto ~/respaldos).')
         parser.add_argument('--guardar', type=int, default=14,
                             help='Cuántos respaldos mantener; los más antiguos se borran.')

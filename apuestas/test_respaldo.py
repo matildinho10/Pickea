@@ -35,3 +35,53 @@ class RespaldoTests(TransactionTestCase):
             self.assertEqual(len(restantes), 2)
             self.assertNotIn('pronostika_2026-09-01_000000.tar.gz', restantes)
             self.assertNotIn('pronostika_2026-09-02_000000.tar.gz', restantes)
+
+
+class RespaldoAutomaticoTests(TransactionTestCase):
+    def setUp(self):
+        from . import respaldo_automatico
+        self.modulo = respaldo_automatico
+        self.modulo._ultima_revision = 0.0
+        self.carpeta = tempfile.TemporaryDirectory()
+        self.ajustes = self.settings(RESPALDOS_DIR=self.carpeta.name)
+        self.ajustes.enable()
+
+    def tearDown(self):
+        self.ajustes.disable()
+        self.carpeta.cleanup()
+
+    def respaldos(self):
+        return list(Path(self.carpeta.name).glob('pronostika_*.tar.gz'))
+
+    def test_crea_uno_si_no_hay_ninguno_y_no_repite_el_mismo_dia(self):
+        import time
+        self.assertTrue(self.modulo.revisar_respaldo())
+        self.assertEqual(len(self.respaldos()), 1)
+        # Dos horas después: ya hay uno de hoy, no crea otro
+        self.assertFalse(self.modulo.revisar_respaldo(ahora=time.time() + 2 * 3600))
+        self.assertEqual(len(self.respaldos()), 1)
+
+    def test_revisa_como_maximo_una_vez_por_hora(self):
+        import time
+        ahora = time.time()
+        self.modulo._ultima_revision = ahora - 60
+        self.assertFalse(self.modulo.revisar_respaldo(ahora=ahora))
+        self.assertEqual(self.respaldos(), [])
+
+    def test_crea_otro_si_el_ultimo_tiene_mas_de_un_dia(self):
+        import os
+        import time
+        viejo = Path(self.carpeta.name) / 'pronostika_2026-09-01_000000.tar.gz'
+        viejo.write_bytes(b'viejo')
+        hace_dos_dias = time.time() - 2 * 24 * 3600
+        os.utime(viejo, (hace_dos_dias, hace_dos_dias))
+        self.assertTrue(self.modulo.revisar_respaldo())
+        self.assertEqual(len(self.respaldos()), 2)
+
+    def test_la_pagina_lo_activa_solo_si_esta_habilitado(self):
+        with self.settings(RESPALDO_AUTOMATICO=False):
+            self.client.get('/como-funciona/')
+        self.assertEqual(self.respaldos(), [])
+        with self.settings(RESPALDO_AUTOMATICO=True):
+            self.client.get('/como-funciona/')
+        self.assertEqual(len(self.respaldos()), 1)

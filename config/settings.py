@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'apuestas.respaldo_automatico.RespaldoDiarioMiddleware',   # respaldo diario (solo en internet)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,6 +141,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Archivos que suben los usuarios (fotos de perfil)
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Respaldos de la base de datos (ver apuestas/respaldo_automatico.py).
+# En internet se crean solos una vez al día; en tu computador, no.
+RESPALDOS_DIR = Path.home() / 'respaldos'
+RESPALDO_AUTOMATICO = not DEBUG
 
 
 # Email

@@ -14,6 +14,7 @@ export DJANGO_DEBUG=0
 export DJANGO_SECRET_KEY="$(cat ~/.pickea_secret)"
 export DJANGO_ALLOWED_HOSTS=matildinho.pythonanywhere.com
 
+python manage.py respaldar        # copia de seguridad antes de cambiar nada
 python manage.py migrate
 python manage.py collectstatic --noinput
 touch /var/www/matildinho_pythonanywhere_com_wsgi.py   # equivale al botón "Reload"
