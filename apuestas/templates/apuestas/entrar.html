@@ -12,6 +12,10 @@
     <input type="hidden" name="next" value="{{ next }}">
     <button type="submit" class="boton-principal">Entrar</button>
   </form>
+  {% if form.cuenta_sin_activar %}
+    <p><a class="fuerte" href="{% url 'reenviar_activacion' %}">Reenviar el correo de activación</a></p>
+  {% endif %}
+  <p class="tenue"><a href="{% url 'recuperar' %}">¿Olvidaste tu contraseña?</a></p>
   <p class="tenue">¿No tienes cuenta? <a href="{% url 'registro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Créala gratis aquí</a>.</p>
 </div>
 {% endblock %}

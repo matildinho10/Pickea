@@ -4,7 +4,12 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import Apuesta, Equipo, Mercado, Opcion, Partido, Temporada, Usuario
 
-admin.site.register(Usuario, UserAdmin)
+
+@admin.register(Usuario)
+class UsuarioAdmin(UserAdmin):
+    list_display = ['username', 'email', 'email_verificado', 'is_active', 'date_joined']
+    list_filter = ['is_active', 'email_verificado', 'is_staff']
+    fieldsets = UserAdmin.fieldsets + (('Pronostika', {'fields': ['foto', 'email_verificado']}),)
 
 
 @admin.register(Temporada)

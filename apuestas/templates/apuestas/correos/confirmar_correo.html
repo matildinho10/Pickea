@@ -1,0 +1,6 @@
+{% extends 'apuestas/correos/_base.html' %}
+{% block contenido %}
+<p style="margin-top:0;">¡Hola, <strong>@{{ usuario.username }}</strong>!</p>
+<p>Agregaste este correo a tu cuenta de {{ NOMBRE_SITIO }}. Confírmalo para poder recuperar tu contraseña si alguna vez la olvidas:</p>
+{% endblock %}
+{% block boton %}Confirmar mi correo{% endblock %}

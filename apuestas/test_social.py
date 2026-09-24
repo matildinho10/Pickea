@@ -145,12 +145,7 @@ class PestanasSinSesionTests(TestCase):
         self.assertEqual(r.url, '/mis-apuestas/')
         self.assertEqual(self.client.get('/mi-perfil/').url, '/u/ana/')
 
-    def test_registro_vuelve_a_donde_queria_ir(self):
-        r = self.client.post('/registro/', {'username': 'nuevo', 'password1': 'unaClaveLarga!9',
-                                            'password2': 'unaClaveLarga!9', 'next': '/mis-apuestas/'})
-        self.assertEqual(r.url, '/mis-apuestas/')
-
     def test_no_redirige_a_otros_sitios(self):
-        r = self.client.post('/registro/', {'username': 'otro', 'password1': 'unaClaveLarga!9',
-                                            'password2': 'unaClaveLarga!9', 'next': 'https://sitio-malo.com/'})
+        r = self.client.post('/entrar/', {'username': 'ana', 'password': 'clave-segura-123',
+                                          'next': 'https://sitio-malo.com/'})
         self.assertEqual(r.url, '/partidos/')

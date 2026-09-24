@@ -1,0 +1,16 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Reenviar activación{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Reenviar activación</h1>
+  <p class="tenue">Escribe el correo con el que creaste tu cuenta y te enviaremos un enlace nuevo para activarla.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <button type="submit" class="boton-principal">Enviar enlace</button>
+  </form>
+  <p class="tenue pequeno"><a href="{% url 'entrar' %}">Volver a Entrar</a></p>
+</div>
+{% endblock %}

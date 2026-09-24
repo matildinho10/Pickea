@@ -783,3 +783,12 @@ th.col-pos { font-family: var(--cuerpo); }
   .guia-seccion h2 { font-size: 26px; }
   .usuario-actual span { display: none; }   /* en celular, solo la foto */
 }
+
+/* ---------- Correo y contraseña ---------- */
+.aviso-acciones { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.aviso-acciones .boton-principal { width: auto; padding: 0 28px; }
+.cuenta-seccion { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 18px; border-top: 1px solid var(--linea); }
+.cuenta-seccion h2 { margin: 0; font-family: var(--titulos); font-size: 24px; font-weight: 700; }
+.cuenta-seccion p { margin: 0; }
+.cuenta-seccion form { width: 100%; align-items: flex-start; }
+.cuenta-seccion .campo { width: 100%; }

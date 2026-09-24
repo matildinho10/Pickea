@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<body style="margin:0; padding:24px 12px; background:#F2EFE7; font-family:Arial, Helvetica, sans-serif; color:#17191C;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; background:#FFFFFF; border:1px solid #DAD5C8; border-radius:12px;">
+        <tr><td style="background:#17191C; padding:18px 28px; border-radius:12px 12px 0 0; font-size:22px; font-weight:bold; color:#F2EFE7;">{{ NOMBRE_SITIO }}</td></tr>
+        <tr><td style="padding:28px; font-size:15px; line-height:1.5;">
+          {% block contenido %}{% endblock %}
+          {% if enlace %}
+          <p style="margin:24px 0;">
+            <a href="{{ enlace }}" style="display:inline-block; background:#A3231B; color:#FFFFFF; text-decoration:none; font-weight:bold; padding:12px 22px; border-radius:8px;">{% block boton %}{% endblock %}</a>
+          </p>
+          <p style="font-size:13px; color:#5A5E66;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="{{ enlace }}" style="color:#A3231B; word-break:break-all;">{{ enlace }}</a></p>
+          {% endif %}
+          <p style="font-size:13px; color:#5A5E66;">El enlace dura 3 días. Si no fuiste tú, ignora este correo.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,7 @@
+¡Hola, @{{ user.username }}!
+
+Pediste crear una contraseña nueva para tu cuenta de {{ NOMBRE_SITIO }}. Abre este enlace para elegirla:
+
+{{ protocol }}://{{ domain }}{% url 'recuperar_confirmar' uidb64=uid token=token %}
+
+El enlace dura 3 días. Si no fuiste tú, ignora este correo: tu contraseña no cambiará.

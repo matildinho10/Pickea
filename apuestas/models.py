@@ -27,6 +27,9 @@ class Usuario(AbstractUser):
     """Usuario de la página. Hereda nombre, contraseña, email, etc. de Django."""
 
     foto = models.ImageField(upload_to=ruta_foto, blank=True)
+    # True cuando el usuario hizo clic en el enlace que le enviamos a su correo.
+    # Solo a correos confirmados se les puede enviar "recuperar contraseña".
+    email_verificado = models.BooleanField('correo confirmado', default=False)
 
     class Meta:
         verbose_name = 'usuario'

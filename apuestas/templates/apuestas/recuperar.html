@@ -1,0 +1,18 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Recuperar contraseña{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>¿Olvidaste tu contraseña?</h1>
+  <p class="tenue">Escribe el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <button type="submit" class="boton-principal">Enviar enlace</button>
+  </form>
+  <p class="tenue pequeno">Solo funciona si tu correo está confirmado. Si creaste tu cuenta antes de que existiera
+     el correo y no lo agregaste en "Editar perfil", pídele al administrador que te ayude.</p>
+  <p class="tenue pequeno"><a href="{% url 'entrar' %}">Volver a Entrar</a></p>
+</div>
+{% endblock %}

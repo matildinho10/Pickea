@@ -1,0 +1,16 @@
+{% extends 'apuestas/base.html' %}
+{# Página simple con un título y un mensaje: "revisa tu correo", "enlace vencido", etc. #}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>{{ titulo }}</h1>
+  <p>{{ mensaje }}</p>
+  <div class="aviso-acciones">
+    {% if entrar %}<a class="boton-principal" href="{% url 'entrar' %}">Entrar</a>{% endif %}
+    {% if reenviar %}<a class="fuerte" href="{% url 'reenviar_activacion' %}">¿No te llegó? Reenviar el correo de activación</a>{% endif %}
+    {% if not entrar %}<a class="fuerte" href="{% url 'ranking' %}">Volver al inicio</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

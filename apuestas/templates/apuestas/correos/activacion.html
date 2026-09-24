@@ -1,0 +1,6 @@
+{% extends 'apuestas/correos/_base.html' %}
+{% block contenido %}
+<p style="margin-top:0;">¡Hola, <strong>@{{ usuario.username }}</strong>!</p>
+<p>Gracias por crear tu cuenta en {{ NOMBRE_SITIO }}. Para activarla, presiona el botón:</p>
+{% endblock %}
+{% block boton %}Activar mi cuenta{% endblock %}

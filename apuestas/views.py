@@ -18,7 +18,8 @@ from django.views.decorators.http import require_POST
 from .estadisticas import MINIMO_PARTIDOS_EFECTIVOS, estadisticas_usuario, ranking as calcular_ranking
 from . import grafico
 from .fotos import procesar_foto
-from .forms import FotoForm, RegistroForm
+from .correos import enviar_activacion, enviar_confirmacion, usuario_del_enlace
+from .forms import CorreoForm, EntrarForm, FotoForm, RegistroForm, ReenviarForm
 from .models import (MERCADOS, Apuesta, Mercado, Opcion, Partido, Seguimiento, Temporada, Usuario,
                      fijar_cierres_pendientes)
 
@@ -222,6 +223,7 @@ def motivo_para_entrar(destino):
 
 class EntrarView(auth_views.LoginView):
     template_name = 'apuestas/entrar.html'
+    form_class = EntrarForm
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
@@ -236,17 +238,89 @@ def mi_perfil(request):
 
 
 def registro(request):
+    """Crea la cuenta desactivada y envía el correo con el enlace para activarla."""
     destino = destino_seguro(request)
     if request.method == 'POST':
         form = RegistroForm(request.POST)
         if form.is_valid():
-            usuario = form.save()
-            login(request, usuario)
-            messages.success(request, f'¡Bienvenido, @{usuario.username}! Ya puedes apostar.')
-            return redirect(destino or 'partidos')
+            usuario = form.save(commit=False)
+            usuario.is_active = False          # se activa con el enlace del correo
+            usuario.save()
+            try:
+                enviar_activacion(request, usuario)
+            except Exception:
+                usuario.delete()               # así puede volver a intentarlo con el mismo nombre
+                form.add_error(None, 'No pudimos enviar el correo de activación. Intenta de nuevo en unos minutos.')
+            else:
+                return render(request, 'apuestas/aviso.html', {
+                    'titulo': 'Revisa tu correo',
+                    'mensaje': f'Te enviamos un enlace a {usuario.email} para activar tu cuenta. '
+                               'Si no lo ves en unos minutos, revisa la carpeta de spam.',
+                    'reenviar': True,
+                })
     else:
         form = RegistroForm()
     return render(request, 'apuestas/registro.html', {'form': form, 'next': destino})
+
+
+def activar(request, uidb64, codigo):
+    """Enlace del correo de registro: activa la cuenta y deja la sesión iniciada."""
+    usuario = usuario_del_enlace(uidb64, codigo)
+    if usuario is None:
+        return render(request, 'apuestas/aviso.html', {
+            'titulo': 'Este enlace ya no sirve',
+            'mensaje': 'Puede que ya lo hayas usado (en ese caso tu cuenta ya está activa y solo tienes que entrar) '
+                       'o que haya vencido: los enlaces duran 3 días.',
+            'reenviar': True, 'entrar': True,
+        }, status=400)
+    usuario.is_active = True
+    usuario.email_verificado = True
+    usuario.save(update_fields=['is_active', 'email_verificado'])
+    login(request, usuario)
+    messages.success(request, f'¡Cuenta activada! Bienvenido, @{usuario.username}. Ya puedes apostar.')
+    return redirect('partidos')
+
+
+def reenviar_activacion(request):
+    form = ReenviarForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        usuario = Usuario.objects.filter(email__iexact=form.cleaned_data['email'], is_active=False).first()
+        if usuario:
+            try:
+                enviar_activacion(request, usuario)
+            except Exception:
+                form.add_error(None, 'No pudimos enviar el correo. Intenta de nuevo en unos minutos.')
+                return render(request, 'apuestas/reenviar.html', {'form': form})
+        # Mismo mensaje exista o no la cuenta: así nadie puede averiguar qué correos están registrados
+        return render(request, 'apuestas/aviso.html', {
+            'titulo': 'Revisa tu correo',
+            'mensaje': 'Si hay una cuenta sin activar con ese correo, te enviamos un nuevo enlace. '
+                       'Revisa también la carpeta de spam.',
+            'entrar': True,
+        })
+    return render(request, 'apuestas/reenviar.html', {'form': form})
+
+
+def confirmar_correo(request, uidb64, codigo):
+    """Enlace del correo que se envía al agregar o cambiar el correo en 'Editar perfil'."""
+    usuario = usuario_del_enlace(uidb64, codigo)
+    if usuario is None:
+        return render(request, 'apuestas/aviso.html', {
+            'titulo': 'Este enlace ya no sirve',
+            'mensaje': 'Puede que ya lo hayas usado o que haya vencido. Desde "Editar perfil" puedes pedir uno nuevo.',
+        }, status=400)
+    usuario.email_verificado = True
+    usuario.save(update_fields=['email_verificado'])
+    messages.success(request, f'¡Listo! Confirmamos tu correo {usuario.email}.')
+    return redirect('cuenta' if request.user == usuario else 'entrar')
+
+
+class CambiarClaveView(auth_views.PasswordChangeView):
+    template_name = 'apuestas/cambiar_clave.html'
+
+    def get_success_url(self):
+        messages.success(self.request, 'Cambiamos tu contraseña.')
+        return reverse('cuenta')
 
 
 def perfil(request, username):
@@ -304,9 +378,24 @@ def seguir(request, username):
 
 @login_required
 def cuenta(request):
-    """Editar tu perfil: subir o quitar la foto."""
+    """Editar tu perfil: foto, correo y contraseña."""
     form = FotoForm()
-    if request.method == 'POST':
+    form_correo = CorreoForm(usuario=request.user, initial={'email': request.user.email})
+    if request.method == 'POST' and request.POST.get('accion') == 'correo':
+        form_correo = CorreoForm(request.POST, usuario=request.user)
+        if form_correo.is_valid():
+            request.user.email = form_correo.cleaned_data['email']
+            request.user.email_verificado = False
+            request.user.save(update_fields=['email', 'email_verificado'])
+            try:
+                enviar_confirmacion(request, request.user)
+            except Exception:
+                messages.error(request, 'Guardamos tu correo, pero no pudimos enviar la confirmación. '
+                                        'Intenta de nuevo en unos minutos.')
+            else:
+                messages.success(request, f'Te enviamos un enlace a {request.user.email} para confirmarlo.')
+            return redirect('cuenta')
+    elif request.method == 'POST':
         if 'quitar' in request.POST:
             request.user.foto.delete(save=True)   # borra el archivo y deja el campo vacío
             messages.success(request, 'Quitamos tu foto. Ahora se muestran tus iniciales.')
@@ -326,7 +415,7 @@ def cuenta(request):
                 messages.success(request, '¡Foto actualizada!')
                 return redirect('perfil', username=request.user.username)
 
-    return render(request, 'apuestas/cuenta.html', {'seccion': 'perfil', 'form': form})
+    return render(request, 'apuestas/cuenta.html', {'seccion': 'perfil', 'form': form, 'form_correo': form_correo})
 
 
 def como_funciona(request):

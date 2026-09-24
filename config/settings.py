@@ -148,14 +148,31 @@ RESPALDOS_DIR = Path.home() / 'respaldos'
 RESPALDO_AUTOMATICO = not DEBUG
 
 
-# Email
+# Correo. En internet se envía con Gmail (el único permitido en el plan
+# gratis de PythonAnywhere); el usuario y la "contraseña de aplicación" se
+# definen en el archivo WSGI del servidor. En tu computador, los correos no
+# se envían: se muestran en la ventana donde corre el servidor.
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+EMAIL_USUARIO = os.environ.get('EMAIL_USUARIO', '')
+if EMAIL_USUARIO:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+            'OPTIONS': {
+                'host': 'smtp.gmail.com',
+                'port': 587,
+                'username': EMAIL_USUARIO,
+                'password': os.environ.get('EMAIL_CLAVE', ''),
+                'use_tls': True,
+                'timeout': 20,
+            },
+        },
+    }
+else:
+    MAILERS = {'default': {'BACKEND': 'django.core.mail.backends.console.EmailBackend'}}
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# Cuánto duran los enlaces de activación y de nueva contraseña (3 días)
+PASSWORD_RESET_TIMEOUT = 3 * 24 * 60 * 60
 
 # Usamos nuestro propio modelo de usuario (apuestas.Usuario) para poder
 # agregarle campos más adelante sin dolor.
@@ -163,6 +180,7 @@ AUTH_USER_MODEL = 'apuestas.Usuario'
 
 # Nombre provisorio de la página: cámbialo aquí y se actualiza en todas partes.
 NOMBRE_SITIO = 'Pronostika'
+DEFAULT_FROM_EMAIL = f'{NOMBRE_SITIO} <{EMAIL_USUARIO or "no-responder@localhost"}>'
 
 # Muestra la etiqueta amarilla "Datos de ejemplo" en la barra superior.
 # Ponlo en False cuando conectemos la API de cuotas reales.

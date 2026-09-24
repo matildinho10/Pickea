@@ -27,6 +27,32 @@
   </form>
   {% endif %}
 
-  <p class="tenue pequeno">La foto se recorta en forma cuadrada. <a href="{% url 'perfil' user.username %}">Volver a mi perfil</a></p>
+  <p class="tenue pequeno">La foto se recorta en forma cuadrada.</p>
+
+  <section class="cuenta-seccion" aria-labelledby="titulo-correo">
+    <h2 id="titulo-correo">Correo</h2>
+    {% if user.email %}
+      <p class="pequeno">
+        <strong>{{ user.email }}</strong> ·
+        {% if user.email_verificado %}<span class="positivo fuerte">Confirmado ✓</span>
+        {% else %}<span class="negativo fuerte">Sin confirmar</span> (revisa tu correo y abre el enlace que te enviamos){% endif %}
+      </p>
+    {% else %}
+      <p class="pequeno tenue">Todavía no tienes correo. Agrégalo para poder recuperar tu contraseña si la olvidas.</p>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="accion" value="correo">
+      {% include 'apuestas/_formulario.html' with form=form_correo %}
+      <button type="submit" class="boton-secundario">{% if user.email %}{% if user.email_verificado %}Cambiar correo{% else %}Reenviar confirmación{% endif %}{% else %}Agregar correo{% endif %}</button>
+    </form>
+  </section>
+
+  <section class="cuenta-seccion" aria-labelledby="titulo-clave">
+    <h2 id="titulo-clave">Contraseña</h2>
+    <a class="boton-secundario" href="{% url 'cambiar_clave' %}">Cambiar contraseña</a>
+  </section>
+
+  <p class="tenue pequeno"><a href="{% url 'perfil' user.username %}">Volver a mi perfil</a></p>
 </div>
 {% endblock %}

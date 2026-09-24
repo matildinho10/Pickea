@@ -1,0 +1,15 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Cambiar contraseña{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Cambiar contraseña</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <button type="submit" class="boton-principal">Cambiar contraseña</button>
+  </form>
+  <p class="tenue pequeno"><a href="{% url 'cuenta' %}">Volver a Editar perfil</a></p>
+</div>
+{% endblock %}

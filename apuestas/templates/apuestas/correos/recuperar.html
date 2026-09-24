@@ -1,0 +1,9 @@
+{% extends 'apuestas/correos/_base.html' %}
+{% block contenido %}{% url 'recuperar_confirmar' uidb64=uid token=token as ruta %}{% with enlace=protocol|add:'://'|add:domain|add:ruta %}
+<p style="margin-top:0;">¡Hola, <strong>@{{ user.username }}</strong>!</p>
+<p>Pediste crear una contraseña nueva para tu cuenta de {{ NOMBRE_SITIO }}. Presiona el botón para elegirla:</p>
+<p style="margin:24px 0;">
+  <a href="{{ enlace }}" style="display:inline-block; background:#A3231B; color:#FFFFFF; text-decoration:none; font-weight:bold; padding:12px 22px; border-radius:8px;">Crear contraseña nueva</a>
+</p>
+<p style="font-size:13px; color:#5A5E66;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="{{ enlace }}" style="color:#A3231B; word-break:break-all;">{{ enlace }}</a></p>
+{% endwith %}{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Nueva contraseña{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  {% if validlink %}
+    <h1>Nueva contraseña</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% include 'apuestas/_formulario.html' %}
+      <button type="submit" class="boton-principal">Guardar contraseña</button>
+    </form>
+  {% else %}
+    <h1>Este enlace ya no sirve</h1>
+    <p>Puede que ya lo hayas usado o que haya vencido (los enlaces duran 3 días).</p>
+    <a class="boton-principal" href="{% url 'recuperar' %}">Pedir un enlace nuevo</a>
+  {% endif %}
+</div>
+{% endblock %}

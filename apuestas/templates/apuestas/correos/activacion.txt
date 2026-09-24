@@ -1,0 +1,7 @@
+¡Hola, @{{ usuario.username }}!
+
+Gracias por crear tu cuenta en {{ NOMBRE_SITIO }}. Para activarla, abre este enlace:
+
+{{ enlace }}
+
+El enlace dura 3 días. Si no fuiste tú, ignora este correo.

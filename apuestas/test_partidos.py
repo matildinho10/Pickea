@@ -76,11 +76,7 @@ class PartidosTests(TestCase):
         self.local.refresh_from_db()
         self.assertEqual(self.local.cuota_cierre, Decimal('1.72'))
 
-    def test_registro_e_inicio_de_sesion(self):
-        r = self.client.post('/registro/', {'username': 'nuevo', 'password1': 'unaClaveLarga!9',
-                                            'password2': 'unaClaveLarga!9'}, follow=True)
-        self.assertTrue(Usuario.objects.filter(username='nuevo').exists())
-        self.assertContains(r, '@nuevo')
-        self.client.post('/salir/')
+    def test_inicio_de_sesion(self):
+        # El registro con correo se prueba en test_correos.py
         r = self.client.post('/entrar/', {'username': 'ana', 'password': 'clave-segura-123'}, follow=True)
         self.assertContains(r, '@ana')
