@@ -45,14 +45,22 @@ class SeguirTests(TestCase):
         self.assertIn('/entrar/', r.url)
         self.assertContains(self.client.get('/u/beto/'), 'href="/entrar/?next=/u/beto/"')
 
-    def test_pestana_siguiendo_del_ranking(self):
+    def test_pestana_siguiendo(self):
         self.client.force_login(self.ana)
-        r = self.client.get('/?ver=siguiendo')
+        r = self.client.get('/siguiendo/')
         self.assertContains(r, 'Todavía no sigues a nadie')
         Seguimiento.objects.create(seguidor=self.ana, seguido=self.beto)
-        r = self.client.get('/?ver=siguiendo')
-        self.assertEqual(r.context['n_siguiendo'], 1)
+        r = self.client.get('/siguiendo/')
+        self.assertEqual([e.usuario for e in r.context['tipsters']], [self.beto])
+        self.assertContains(r, '@beto')
         self.assertNotContains(r, 'Todavía no sigues a nadie')
+
+    def test_dejar_de_seguir_desde_siguiendo_vuelve_a_siguiendo(self):
+        self.client.force_login(self.ana)
+        Seguimiento.objects.create(seguidor=self.ana, seguido=self.beto)
+        r = self.client.post('/u/beto/seguir/', {'next': '/siguiendo/'})
+        self.assertEqual(r.url, '/siguiendo/')
+        self.assertFalse(self.ana.sigue_a(self.beto))
 
 
 @override_settings(MEDIA_ROOT=MEDIA_PRUEBA)
@@ -129,8 +137,11 @@ class PestanasSinSesionTests(TestCase):
 
     def test_la_barra_muestra_todas_las_pestanas(self):
         r = self.client.get('/')
+        self.assertContains(r, '>Picks</a>')
         self.assertContains(r, '>Mis apuestas</a>')
-        self.assertContains(r, '>Mi perfil</a>')
+        self.assertContains(r, '>Siguiendo</a>')
+        self.assertNotContains(r, '>Mi perfil</a>')    # se entra tocando tu nombre arriba
+        self.assertNotContains(r, '>Partidos</a>')
 
     def test_sin_sesion_explica_por_que_hay_que_entrar(self):
         r = self.client.get('/mis-apuestas/', follow=True)

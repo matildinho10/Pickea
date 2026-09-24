@@ -5,7 +5,7 @@ Buscan los datos y se los pasan a una plantilla HTML (carpeta templates/).
 import logging
 
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -29,31 +29,41 @@ ORDEN_MERCADOS = list(MERCADOS)
 log = logging.getLogger(__name__)
 
 
-def ranking(request):
+# Cómo se puede ordenar el ranking: nombre visible y criterio (mejor primero)
+ORDENES_RANKING = {
+    'pvalue': ('p-value', lambda e: (e.z is None, -(e.z or 0))),   # z alto = p-value bajo
+    'ganancia': ('Ganancia', lambda e: -e.ganancia),
+    'roi': ('ROI', lambda e: (e.roi is None, -(e.roi or 0))),
+}
+
+
+def periodo_elegido(request):
+    """Temporada activa y si se pidió 'temporada' o 'historico' (?periodo=...)."""
     temporada = Temporada.objects.filter(activa=True).first()
     periodo = 'historico' if request.GET.get('periodo') == 'historico' or temporada is None else 'temporada'
-    siguiendo = request.GET.get('ver') == 'siguiendo' and request.user.is_authenticated
-    en_ranking, bajo_minimo = calcular_ranking(temporada if periodo == 'temporada' else None)
-    for puesto, e in enumerate(en_ranking, 1):
-        e.puesto = puesto   # puesto en el ranking completo, aunque después filtremos
+    return temporada, periodo, (temporada if periodo == 'temporada' else None)
 
-    n_siguiendo = 0
-    if siguiendo:
-        ids = set(request.user.seguimientos.values_list('seguido_id', flat=True))
-        n_siguiendo = len(ids)
-        en_ranking = [e for e in en_ranking if e.usuario.pk in ids]
-        bajo_minimo = [e for e in bajo_minimo if e.usuario.pk in ids]
+
+def ranking(request):
+    temporada, periodo, filtro = periodo_elegido(request)
+    orden = request.GET.get('orden') if request.GET.get('orden') in ORDENES_RANKING else 'pvalue'
+    criterio = ORDENES_RANKING[orden][1]
+
+    en_ranking, bajo_minimo = calcular_ranking(filtro)
+    en_ranking.sort(key=criterio)
+    bajo_minimo.sort(key=criterio)
+    for puesto, e in enumerate(en_ranking, 1):
+        e.puesto = puesto
 
     return render(request, 'apuestas/ranking.html', {
         'seccion': 'ranking',
         'temporada': temporada,
         'periodo': periodo,
-        'ver': 'siguiendo' if siguiendo else 'todos',
-        'n_siguiendo': n_siguiendo,
+        'orden': orden,
+        'ordenes': [(clave, nombre) for clave, (nombre, _) in ORDENES_RANKING.items()],
         'en_ranking': en_ranking,
         'bajo_minimo': bajo_minimo,
-        # En "Siguiendo" se muestran siempre, porque son pocos y los elegiste tú
-        'ver_bajo_minimo': 'bajo' in request.GET or siguiendo,
+        'ver_bajo_minimo': 'bajo' in request.GET,
         'minimo': MINIMO_PARTIDOS_EFECTIVOS,
     })
 
@@ -206,6 +216,7 @@ MOTIVOS_PARA_ENTRAR = [
     ('/mi-perfil/', 'Inicia sesión para ver tu perfil.'),
     ('/cuenta/', 'Inicia sesión para editar tu perfil.'),
     ('/partidos/', 'Inicia sesión para apostar.'),
+    ('/siguiendo/', 'Inicia sesión para ver a los tipsters que sigues.'),
     ('/apostar/', 'Inicia sesión para apostar.'),
     ('/u/', 'Inicia sesión para seguir a otros tipsters.'),
 ]
@@ -328,11 +339,25 @@ class CambiarClaveView(auth_views.PasswordChangeView):
         return reverse('cuenta')
 
 
+def ultimas_decididas(usuario, temporada=None, partidos=8):
+    """
+    Apuestas ya decididas de los últimos partidos de un usuario, agrupadas por partido.
+    No se muestran las activas, para que nadie copie picks que todavía están abiertos.
+    """
+    decididas = (Apuesta.objects.filter(usuario=usuario)
+                 .exclude(opcion__resultado=Opcion.Resultado.PENDIENTE)
+                 .select_related('opcion__mercado__partido__local', 'opcion__mercado__partido__visita'))
+    if temporada:
+        decididas = decididas.filter(opcion__mercado__partido__temporada=temporada)
+    ultimos = list(Partido.objects.filter(mercados__opciones__apuestas__in=decididas)
+                   .distinct().order_by('-inicio', '-pk')[:partidos])
+    return agrupar_por_partido(decididas.filter(opcion__mercado__partido__in=ultimos)
+                               .order_by('-opcion__mercado__partido__inicio', 'creada'))
+
+
 def perfil(request, username):
     usuario = get_object_or_404(Usuario, username=username)
-    temporada = Temporada.objects.filter(activa=True).first()
-    periodo = 'historico' if request.GET.get('periodo') == 'historico' or temporada is None else 'temporada'
-    filtro = temporada if periodo == 'temporada' else None
+    temporada, periodo, filtro = periodo_elegido(request)
     stats = estadisticas_usuario(usuario, filtro)
 
     # Puesto en el ranking de la temporada (solo si llega al mínimo)
@@ -341,16 +366,7 @@ def perfil(request, username):
         en_ranking, _ = calcular_ranking(temporada)
         puesto = next((i for i, e in enumerate(en_ranking, 1) if e.usuario == usuario), None)
 
-    # Últimas apuestas decididas (no se muestran las activas para que nadie copie picks abiertos)
-    decididas = (Apuesta.objects.filter(usuario=usuario)
-                 .exclude(opcion__resultado=Opcion.Resultado.PENDIENTE)
-                 .select_related('opcion__mercado__partido__local', 'opcion__mercado__partido__visita'))
-    if filtro:
-        decididas = decididas.filter(opcion__mercado__partido__temporada=filtro)
-    ultimos = list(Partido.objects.filter(mercados__opciones__apuestas__in=decididas)
-                   .distinct().order_by('-inicio', '-pk')[:8])
-    grupos = agrupar_por_partido(decididas.filter(opcion__mercado__partido__in=ultimos)
-                                 .order_by('-opcion__mercado__partido__inicio', 'creada'))
+    grupos = ultimas_decididas(usuario, filtro, partidos=8)
 
     return render(request, 'apuestas/perfil.html', {
         'seccion': 'perfil' if request.user == usuario else None,
@@ -378,7 +394,54 @@ def seguir(request, username):
         seguimiento, creado = Seguimiento.objects.get_or_create(seguidor=request.user, seguido=usuario)
         if not creado:
             seguimiento.delete()
-    return redirect('perfil', username=usuario.username)
+    return redirect(destino_seguro(request) or reverse('perfil', args=[usuario.username]))
+
+
+@login_required
+def siguiendo(request):
+    """Los tipsters que sigues: sus números y sus últimas apuestas decididas."""
+    temporada, periodo, filtro = periodo_elegido(request)
+    tipsters = []
+    for usuario in Usuario.objects.filter(seguidores__seguidor=request.user).order_by('username'):
+        stats = estadisticas_usuario(usuario, filtro)
+        stats.grupos = ultimas_decididas(usuario, filtro, partidos=3)
+        tipsters.append(stats)
+    tipsters.sort(key=ORDENES_RANKING['pvalue'][1])
+    return render(request, 'apuestas/siguiendo.html', {
+        'seccion': 'siguiendo',
+        'temporada': temporada,
+        'periodo': periodo,
+        'tipsters': tipsters,
+        'minimo': MINIMO_PARTIDOS_EFECTIVOS,
+    })
+
+
+@login_required
+def borrar_cuenta(request):
+    """Borra la cuenta y todo lo asociado (apuestas, seguimientos, foto). Pide la contraseña."""
+    error = ''
+    if request.method == 'POST':
+        if request.user.check_password(request.POST.get('password', '')):
+            usuario = request.user
+            if usuario.foto:
+                usuario.foto.delete(save=False)
+            logout(request)
+            usuario.delete()   # las apuestas y seguimientos se borran en cascada
+            return render(request, 'apuestas/aviso.html', {
+                'titulo': 'Cuenta borrada',
+                'mensaje': 'Borramos tu cuenta, tus apuestas y tu foto. Las copias de seguridad '
+                           'se eliminan solas en un máximo de 14 días. ¡Gracias por haber probado Pronostika!',
+            })
+        error = 'La contraseña no es correcta.'
+    return render(request, 'apuestas/borrar_cuenta.html', {'seccion': 'perfil', 'error': error})
+
+
+def terminos(request):
+    return render(request, 'apuestas/terminos.html')
+
+
+def privacidad(request):
+    return render(request, 'apuestas/privacidad.html')
 
 
 @login_required

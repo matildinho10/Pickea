@@ -3,9 +3,10 @@
   <div class="mensaje mensaje-error">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>
 {% endif %}
 {% for campo in form %}
-  <div class="campo">
+  <div class="campo{% if campo.widget_type == 'checkbox' %} campo-casilla{% endif %}">
+    {% if campo.widget_type == 'checkbox' %}{{ campo }}{% endif %}
     <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
-    {{ campo }}
+    {% if campo.widget_type != 'checkbox' %}{{ campo }}{% endif %}
     {% if campo.help_text %}<div class="ayuda">{{ campo.help_text|safe }}</div>{% endif %}
     {% for e in campo.errors %}<div class="error">{{ e }}</div>{% endfor %}
   </div>

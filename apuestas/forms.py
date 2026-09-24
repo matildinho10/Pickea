@@ -19,6 +19,9 @@ def correo_disponible(email, excepto=None):
 
 class RegistroForm(UserCreationForm):
     email = forms.EmailField(label='Correo', help_text='Te enviaremos un enlace para activar tu cuenta.')
+    acepto = forms.BooleanField(
+        label='Tengo 18 años o más y acepto los Términos de uso y la Política de privacidad',
+        error_messages={'required': 'Debes aceptar para crear tu cuenta.'})
 
     class Meta:
         model = Usuario

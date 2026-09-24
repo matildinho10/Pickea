@@ -792,3 +792,70 @@ th.col-pos { font-family: var(--cuerpo); }
 .cuenta-seccion p { margin: 0; }
 .cuenta-seccion form { width: 100%; align-items: flex-start; }
 .cuenta-seccion .campo { width: 100%; }
+
+/* ============================================================
+   Orden del ranking, Siguiendo, borrar cuenta, pie y páginas legales
+   ============================================================ */
+.barra-orden { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pestanas-chicas { padding: 3px; }
+.pestanas-chicas a { height: 36px; padding: 0 14px; font-size: 14px; }
+.tabla-ranking th.ordenado { color: var(--texto); box-shadow: inset 0 -2px 0 var(--acento); }
+
+.usuario-actual.activo span { text-decoration: underline; text-underline-offset: 6px; text-decoration-color: var(--nav-activo); text-decoration-thickness: 3px; }
+
+.tipster { overflow: hidden; }
+.tipster-cabecera { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 18px 24px; }
+.tipster-cabecera form { margin: 0 0 0 auto; }
+.tipster-nombre { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; text-decoration: none; }
+.tipster-nombre .avatar { width: 48px; height: 48px; font-size: 20px; }
+.tipster-datos { display: flex; gap: 24px; margin: 0; flex-wrap: wrap; }
+.tipster-datos dt { font-size: 12px; font-weight: 600; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; }
+.tipster-datos dd { margin: 2px 0 0; font-size: 18px; font-weight: 600; }
+.tipster .lista-grupos { border-top: 1px solid var(--linea); }
+.tipster-pie { display: block; padding: 12px 24px; border-top: 1px solid var(--linea); font-size: 14px; text-decoration: none; }
+.sin-margen { margin-top: 0; }
+
+.boton-peligro {
+  display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid var(--negativo); color: var(--negativo); background: var(--blanco);
+  font-size: 14px; font-weight: 600; text-decoration: none;
+}
+.boton-peligro:hover { background: #F6E1DE; color: var(--negativo); }
+.boton-peligro-lleno { background: var(--negativo); }
+.boton-peligro-lleno:hover { background: var(--acento-hover); }
+
+.campo-casilla { flex-direction: row; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.campo-casilla input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--acento); flex-shrink: 0; }
+.campo-casilla label { flex: 1; font-weight: 500; }
+.campo-casilla .error { flex-basis: 100%; }
+
+.pie {
+  max-width: 1280px; margin: 0 auto; padding: 24px 40px 40px;
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  border-top: 1px solid var(--borde); font-size: 13px; color: var(--gris);
+}
+.pie nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.pie a { color: var(--gris); }
+.pie a:hover { color: var(--acento); }
+
+.legal { max-width: 760px; padding: 32px 40px; }
+.legal h1 { font-size: 44px; }
+.legal h2 { margin: 28px 0 8px; font-family: var(--titulos); font-size: 24px; font-weight: 700; }
+.legal p, .legal ul { margin: 0 0 12px; }
+.legal li + li { margin-top: 4px; }
+
+@media (max-width: 700px) {
+  .tipster-cabecera { padding: 16px 12px; gap: 14px; }
+  .tipster-cabecera form { margin-left: 0; }
+  .tipster-datos { gap: 16px; }
+  .tipster-pie { padding: 12px; }
+  .pie { padding: 20px 16px 32px; }
+  .legal { padding: 22px 18px; }
+  .legal h1 { font-size: 34px; }
+}
+
+@media (max-width: 520px) {
+  /* Nombres largos se acortan con "…" para que siempre quepa el p-value */
+  .tabla-ranking .enlace-usuario { gap: 6px; }
+  .tabla-ranking .enlace-usuario span { display: inline-block; max-width: 28vw; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+}

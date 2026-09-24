@@ -8,9 +8,9 @@
         <th scope="col">Usuario</th>
         <th scope="col" class="num col-opcional-chica">Partidos ef. <a class="ayuda-q" href="{% url 'como_funciona' %}#partidos-efectivos" aria-label="¿Qué son los partidos efectivos?">?</a></th>
         <th scope="col" class="num col-opcional">Apuestas</th>
-        <th scope="col" class="num">ROI <a class="ayuda-q" href="{% url 'como_funciona' %}#roi" aria-label="¿Qué es el ROI?">?</a></th>
-        <th scope="col" class="num col-opcional">Ganancia</th>
-        <th scope="col" class="num">p-value <a class="ayuda-q" href="{% url 'como_funciona' %}#p-value" aria-label="¿Qué es el p-value?">?</a></th>
+        <th scope="col" class="num{% if orden == 'roi' %} ordenado{% elif orden == 'ganancia' %} col-opcional-chica{% endif %}">ROI <a class="ayuda-q" href="{% url 'como_funciona' %}#roi" aria-label="¿Qué es el ROI?">?</a></th>
+        <th scope="col" class="num{% if orden == 'ganancia' %} ordenado{% else %} col-opcional{% endif %}">Ganancia</th>
+        <th scope="col" class="num{% if orden == 'pvalue' %} ordenado{% endif %}">p-value <a class="ayuda-q" href="{% url 'como_funciona' %}#p-value" aria-label="¿Qué es el p-value?">?</a></th>
       </tr>
     </thead>
     <tbody>
@@ -20,8 +20,8 @@
         <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">{% include 'apuestas/_avatar.html' with u=e.usuario tamano='chico' %}<span>@{{ e.usuario.username }}</span></a></td>
         <td class="num mono col-opcional-chica">{{ e.partidos_efectivos|floatformat:0 }}</td>
         <td class="num mono tenue col-opcional">{{ e.apuestas }}</td>
-        <td class="num mono fuerte {{ e.roi|tono }}">{{ e.roi|porcentaje }}</td>
-        <td class="num mono col-opcional {{ e.ganancia|tono }}">{{ e.ganancia|con_signo }} u</td>
+        <td class="num mono fuerte {% if orden == 'ganancia' %}col-opcional-chica {% endif %}{{ e.roi|tono }}">{{ e.roi|porcentaje }}</td>
+        <td class="num mono {% if orden != 'ganancia' %}col-opcional {% endif %}{{ e.ganancia|tono }}">{{ e.ganancia|con_signo }} u</td>
         <td class="num mono fuerte {% if e.p_valor is not None and e.p_valor < 0.05 %}positivo{% endif %}">{{ e.p_valor|pvalor }}</td>
       </tr>
       {% empty %}

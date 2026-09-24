@@ -7,45 +7,45 @@
 <div class="encabezado">
   <div class="encabezado-texto">
     <h1>Ranking</h1>
-    <p>Ordenado por p-value: qué tan difícil es explicar el resultado de cada usuario solo con suerte.
-       Un ROI alto con pocas apuestas no basta para subir.</p>
+    <p>
+      {% if orden == 'ganancia' %}Ordenado por ganancia: quién ha ganado más unidades en total.
+      {% elif orden == 'roi' %}Ordenado por ROI: quién gana más por cada unidad apostada.
+      {% else %}Ordenado por p-value: qué tan difícil es explicar el resultado de cada usuario solo con suerte.
+        Un ROI alto con pocas apuestas no basta para subir.{% endif %}
+    </p>
   </div>
-  <div class="grupo-pestanas">
-    {% if user.is_authenticated %}
-    <nav class="pestanas" aria-label="Quiénes">
-      <a href="?periodo={{ periodo }}" {% if ver == 'todos' %}aria-current="page"{% endif %}>Todos</a>
-      <a href="?periodo={{ periodo }}&ver=siguiendo" {% if ver == 'siguiendo' %}aria-current="page"{% endif %}>Siguiendo</a>
-    </nav>
-    {% endif %}
-    {% if temporada %}
-    <nav class="pestanas" aria-label="Período">
-      <a href="?periodo=temporada{% if ver == 'siguiendo' %}&ver=siguiendo{% endif %}" {% if periodo == 'temporada' %}aria-current="page"{% endif %}>Temporada {{ temporada.anio }}</a>
-      <a href="?periodo=historico{% if ver == 'siguiendo' %}&ver=siguiendo{% endif %}" {% if periodo == 'historico' %}aria-current="page"{% endif %}>Histórico</a>
-    </nav>
-    {% endif %}
-  </div>
+  {% if temporada %}
+  <nav class="pestanas" aria-label="Período">
+    <a href="{% querystring periodo='temporada' %}" {% if periodo == 'temporada' %}aria-current="page"{% endif %}>Temporada {{ temporada.anio }}</a>
+    <a href="{% querystring periodo='historico' %}" {% if periodo == 'historico' %}aria-current="page"{% endif %}>Histórico</a>
+  </nav>
+  {% endif %}
 </div>
 
-{% if ver == 'siguiendo' %}
-  {% if n_siguiendo == 0 %}
-    <p class="tarjeta relleno">Todavía no sigues a nadie. Entra al perfil de un tipster (tocando su nombre) y presiona <strong>Seguir</strong>.</p>
-  {% else %}
-    {% include 'apuestas/_tabla_ranking.html' with filas=en_ranking numerar=True vacio="Ninguno de los tipsters que sigues llega todavía al mínimo de partidos efectivos." %}
+<div class="barra-orden">
+  <span class="tenue pequeno fuerte">Ordenar por</span>
+  <nav class="pestanas pestanas-chicas" aria-label="Ordenar el ranking por">
+    {% for clave, nombre in ordenes %}
+      <a href="{% querystring orden=clave %}" {% if orden == clave %}aria-current="page"{% endif %}>{{ nombre }}</a>
+    {% endfor %}
+  </nav>
+  {% if orden != 'pvalue' %}
+    <span class="tenue pequeno">Ojo: la ganancia y el ROI no consideran cuánta suerte hubo; el p-value sí.</span>
   {% endif %}
-{% else %}
-  {% include 'apuestas/_tabla_ranking.html' with filas=en_ranking numerar=True vacio="Todavía nadie llega al mínimo de partidos efectivos." %}
-{% endif %}
+</div>
+
+{% include 'apuestas/_tabla_ranking.html' with filas=en_ranking numerar=True vacio="Todavía nadie llega al mínimo de partidos efectivos." %}
 
 <div class="nota-pie">
   <p>Para entrar al ranking se necesitan al menos {{ minimo }} partidos efectivos.
      El p-value es la probabilidad de lograr un resultado igual o mejor por pura suerte,
      apostando sin ventaja sobre las cuotas. Mientras más bajo, más evidencia de habilidad; en verde, menor a 0.05.
      <a href="{% url 'como_funciona' %}">¿Qué significa cada columna?</a></p>
-  {% if bajo_minimo and ver != 'siguiendo' %}
+  {% if bajo_minimo %}
     {% if ver_bajo_minimo %}
-      <a href="?periodo={{ periodo }}">Ocultar usuarios bajo el mínimo</a>
+      <a href="{% querystring bajo=None %}">Ocultar usuarios bajo el mínimo</a>
     {% else %}
-      <a href="?periodo={{ periodo }}&bajo=1#bajo-minimo">Ver usuarios bajo el mínimo ({{ bajo_minimo|length }})</a>
+      <a href="{% querystring bajo=1 %}#bajo-minimo">Ver usuarios bajo el mínimo ({{ bajo_minimo|length }})</a>
     {% endif %}
   {% endif %}
 </div>

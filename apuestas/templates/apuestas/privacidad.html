@@ -1,0 +1,63 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Política de privacidad{% endblock %}
+
+{% block contenido %}
+<article class="tarjeta legal">
+  <h1>Política de privacidad</h1>
+  <p class="tenue pequeno">Última actualización: 24 de septiembre de 2026</p>
+
+  <p>Aquí explicamos qué datos guardamos cuando usas {{ NOMBRE_SITIO }}, para qué los usamos y qué puedes hacer con ellos.</p>
+
+  <h2>1. Qué datos guardamos</h2>
+  <ul>
+    <li><strong>Datos de tu cuenta:</strong> nombre de usuario, correo y contraseña. La contraseña se guarda cifrada: nadie puede verla, ni siquiera nosotros.</li>
+    <li><strong>Tu foto de perfil</strong>, si decides subir una.</li>
+    <li><strong>Tu actividad:</strong> tus apuestas, a quién sigues, y las fechas en que creaste tu cuenta y entraste por última vez.</li>
+    <li><strong>Datos técnicos:</strong> el servidor registra automáticamente las visitas (por ejemplo, la dirección IP y la página visitada) para funcionar y detectar problemas.</li>
+  </ul>
+  <p>No pedimos tu nombre real, tu RUT, tu teléfono ni datos bancarios.</p>
+
+  <h2>2. Para qué los usamos</h2>
+  <ul>
+    <li>Para que puedas usar tu cuenta y apostar en el simulador.</li>
+    <li>Para calcular tus estadísticas y mostrarte en el ranking.</li>
+    <li>Para enviarte correos necesarios: activar tu cuenta, confirmar tu correo y recuperar tu contraseña. No enviamos publicidad.</li>
+    <li>Para mantener la página segura y funcionando.</li>
+  </ul>
+  <p><strong>No vendemos ni compartimos tus datos</strong> con terceros para publicidad.</p>
+
+  <h2>3. Qué es público</h2>
+  <p>Tu nombre de usuario, tu foto, tus estadísticas, tus apuestas ya decididas y cuántos seguidores tienes se muestran
+     públicamente en el ranking y en tu perfil. <strong>Tu correo nunca se muestra.</strong></p>
+
+  <h2>4. Quién nos ayuda a funcionar</h2>
+  <ul>
+    <li><strong>PythonAnywhere</strong> aloja la página y la base de datos, en servidores ubicados en Estados Unidos.</li>
+    <li><strong>Google (Gmail)</strong> envía los correos de la página.</li>
+  </ul>
+  <p>Estos servicios tratan los datos solo para prestarnos su servicio.</p>
+
+  <h2>5. Cookies</h2>
+  <p>Usamos solo las cookies necesarias para que la página funcione: una para mantener tu sesión iniciada y otra de
+     seguridad para los formularios. No usamos cookies de publicidad ni de seguimiento.</p>
+
+  <h2>6. Cuánto tiempo guardamos tus datos</h2>
+  <p>Mientras tengas tu cuenta. Si la borras, eliminamos tu cuenta, tus apuestas y tu foto de inmediato; las copias de
+     seguridad se borran solas en un máximo de 14 días.</p>
+
+  <h2>7. Tus derechos</h2>
+  <p>Según la ley chilena de protección de datos personales, puedes pedir <strong>acceder</strong> a tus datos,
+     <strong>corregirlos</strong>, <strong>borrarlos</strong> u <strong>oponerte</strong> a su uso. Puedes borrar tu cuenta tú mismo
+     desde "Editar perfil", o escribirnos para cualquiera de estas solicitudes.</p>
+
+  <h2>8. Menores de edad</h2>
+  <p>{{ NOMBRE_SITIO }} es solo para mayores de 18 años. Si descubrimos una cuenta de un menor, la borraremos.</p>
+
+  <h2>9. Cambios y contacto</h2>
+  <p>Si cambiamos esta política de forma importante, lo avisaremos en la página. Para consultas o solicitudes sobre tus datos,
+     escríbenos a <a href="mailto:pronostika.chile@gmail.com">pronostika.chile@gmail.com</a>.</p>
+
+  <p class="tenue pequeno">Ver también los <a href="{% url 'terminos' %}">Términos de uso</a>.</p>
+</article>
+{% endblock %}

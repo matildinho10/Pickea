@@ -32,7 +32,7 @@
     {% include 'apuestas/_grupo_apuestas.html' %}
   {% empty %}
     <p class="vacio relleno">
-      {% if vista == 'activas' %}No tienes apuestas activas. <a href="{% url 'partidos' %}">Ver partidos</a>
+      {% if vista == 'activas' %}No tienes apuestas activas. <a href="{% url 'partidos' %}">Ir a Picks</a>
       {% else %}Todavía no tienes apuestas decididas.{% endif %}
     </p>
   {% endfor %}

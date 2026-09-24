@@ -53,6 +53,12 @@
     <a class="boton-secundario" href="{% url 'cambiar_clave' %}">Cambiar contraseña</a>
   </section>
 
+  <section class="cuenta-seccion" aria-labelledby="titulo-borrar">
+    <h2 id="titulo-borrar">Borrar cuenta</h2>
+    <p class="pequeno tenue">Se borran tu cuenta, tus apuestas, tus seguidores y tu foto. No se puede deshacer.</p>
+    <a class="boton-peligro" href="{% url 'borrar_cuenta' %}">Borrar mi cuenta</a>
+  </section>
+
   <p class="tenue pequeno"><a href="{% url 'perfil' user.username %}">Volver a mi perfil</a></p>
 </div>
 {% endblock %}

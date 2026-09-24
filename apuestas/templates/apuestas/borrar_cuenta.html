@@ -1,0 +1,26 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Borrar cuenta{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Borrar cuenta</h1>
+  <p>Vas a borrar <strong>@{{ user.username }}</strong>. Esto elimina para siempre:</p>
+  <ul class="pequeno">
+    <li>Tu cuenta, tu correo y tu foto.</li>
+    <li>Todas tus apuestas: desaparecerás del ranking.</li>
+    <li>A quién sigues y quién te sigue.</li>
+  </ul>
+  <p class="pequeno tenue">No se puede deshacer. Las copias de seguridad se eliminan solas en un máximo de 14 días.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% if error %}<div class="mensaje mensaje-error">{{ error }}</div>{% endif %}
+    <div class="campo">
+      <label for="password">Escribe tu contraseña para confirmar</label>
+      <input type="password" name="password" id="password" required autocomplete="current-password">
+    </div>
+    <button type="submit" class="boton-principal boton-peligro-lleno">Sí, borrar mi cuenta para siempre</button>
+  </form>
+  <p class="tenue pequeno"><a href="{% url 'cuenta' %}">No, volver a Editar perfil</a></p>
+</div>
+{% endblock %}

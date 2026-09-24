@@ -12,6 +12,8 @@
     <input type="hidden" name="next" value="{{ next }}">
     <button type="submit" class="boton-principal">Crear cuenta</button>
   </form>
+  <p class="tenue pequeno">Lee los <a href="{% url 'terminos' %}" target="_blank">Términos de uso</a> y la
+     <a href="{% url 'privacidad' %}" target="_blank">Política de privacidad</a> antes de aceptar.</p>
   <p class="tenue">¿Ya tienes cuenta? <a href="{% url 'entrar' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Entra aquí</a>.</p>
 </div>
 {% endblock %}

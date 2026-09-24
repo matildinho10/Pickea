@@ -1,7 +1,7 @@
 {% extends 'apuestas/base.html' %}
 {% load static l10n %}
 
-{% block titulo %}Partidos{% endblock %}
+{% block titulo %}Picks{% endblock %}
 
 {% block contenido %}
 {% localize off %}{# cuotas con punto decimal (1.72), no con coma #}
@@ -10,7 +10,7 @@
     <div class="encabezado">
       <div class="encabezado-texto">
         {% if temporada %}<div class="antetitulo">{{ temporada.nombre }}</div>{% endif %}
-        <h1 id="titulo-fecha">{% if fecha %}Fecha {{ fecha }}{% else %}Partidos{% endif %}</h1>
+        <h1 id="titulo-fecha">{% if fecha %}Fecha {{ fecha }}{% else %}Picks{% endif %}</h1>
       </div>
       <nav class="navegar-fechas" aria-label="Cambiar de fecha">
         {% if anterior %}<a href="?fecha={{ anterior }}">← Fecha {{ anterior }}</a>{% endif %}

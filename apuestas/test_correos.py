@@ -19,7 +19,7 @@ class RegistroConCorreoTests(TestCase):
 
     def registrar(self, username='nuevo', email='nuevo@ejemplo.com'):
         return self.client.post('/registro/', {'username': username, 'email': email,
-                                               'password1': CLAVE, 'password2': CLAVE})
+                                               'password1': CLAVE, 'password2': CLAVE, 'acepto': 'on'})
 
     def test_registro_envia_correo_y_la_cuenta_queda_inactiva(self):
         r = self.registrar()
@@ -73,6 +73,12 @@ class RegistroConCorreoTests(TestCase):
         r = self.client.post('/reenviar-activacion/', {'email': 'nadie@ejemplo.com'})
         self.assertContains(r, 'Revisa tu correo')
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_hay_que_aceptar_los_terminos(self):
+        r = self.client.post('/registro/', {'username': 'x', 'email': 'x@ejemplo.com',
+                                            'password1': CLAVE, 'password2': CLAVE})
+        self.assertContains(r, 'Debes aceptar para crear tu cuenta')
+        self.assertFalse(Usuario.objects.filter(username='x').exists())
 
     def test_si_falla_el_envio_se_puede_reintentar(self):
         from unittest import mock

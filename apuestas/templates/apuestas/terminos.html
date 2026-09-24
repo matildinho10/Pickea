@@ -1,0 +1,62 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Términos de uso{% endblock %}
+
+{% block contenido %}
+<article class="tarjeta legal">
+  <h1>Términos de uso</h1>
+  <p class="tenue pequeno">Última actualización: 24 de septiembre de 2026</p>
+
+  <p>Estos términos explican las reglas para usar {{ NOMBRE_SITIO }}. Al crear una cuenta, aceptas cumplirlos.</p>
+
+  <h2>1. Qué es {{ NOMBRE_SITIO }}</h2>
+  <p>{{ NOMBRE_SITIO }} es un <strong>simulador</strong> de apuestas del fútbol chileno. Se apuesta con unidades ficticias
+     y el objetivo es medir qué tan bien eliges tus pronósticos.</p>
+  <ul>
+    <li><strong>No se juega con dinero real.</strong> No se puede depositar, apostar ni retirar dinero.</li>
+    <li><strong>No hay premios</strong> en dinero ni en especies, salvo que se anuncie expresamente lo contrario.</li>
+    <li><strong>No somos una casa de apuestas</strong> ni promovemos apostar dinero. Las cuotas se muestran solo como referencia para la simulación.</li>
+  </ul>
+
+  <h2>2. Quién puede usarlo</h2>
+  <p>Debes tener <strong>18 años o más</strong>. Cada persona puede tener <strong>una sola cuenta</strong>: tener varias
+     para mejorar tu posición en el ranking no está permitido.</p>
+
+  <h2>3. Tu cuenta</h2>
+  <ul>
+    <li>Eres responsable de mantener tu contraseña en secreto y de lo que se haga con tu cuenta.</li>
+    <li>Tu nombre de usuario, tu foto, tus estadísticas y tus apuestas ya decididas son <strong>públicos</strong>: cualquiera los puede ver en el ranking y en tu perfil. Tu correo no se muestra.</li>
+    <li>Puedes borrar tu cuenta cuando quieras desde "Editar perfil".</li>
+  </ul>
+
+  <h2>4. Qué no está permitido</h2>
+  <ul>
+    <li>Usar nombres de usuario o fotos ofensivos, discriminatorios, sexuales o que suplanten a otra persona.</li>
+    <li>Crear varias cuentas, usar programas automáticos (bots) o intentar alterar el ranking de cualquier forma.</li>
+    <li>Intentar entrar a cuentas ajenas, dañar la página o saltarse sus medidas de seguridad.</li>
+  </ul>
+  <p>Podemos cambiar un nombre o una foto inapropiados, y suspender o borrar cuentas que no cumplan estas reglas.</p>
+
+  <h2>5. Cuotas, resultados y estadísticas</h2>
+  <p>Hacemos lo posible para que las cuotas, los resultados y las estadísticas sean correctos, pero pueden tener errores.
+     Si detectamos uno (por ejemplo, un resultado mal cargado), podemos <strong>corregirlo y recalcular</strong> las apuestas
+     y el ranking afectados.</p>
+
+  <h2>6. Disponibilidad</h2>
+  <p>{{ NOMBRE_SITIO }} es un servicio gratuito y se entrega "tal cual". Puede tener interrupciones, cambios o
+     dejar de funcionar, y no garantizamos que esté siempre disponible.</p>
+
+  <h2>7. Juego responsable</h2>
+  <p>Este simulador no involucra dinero, pero si apuestas dinero en otros lugares y sientes que te está afectando,
+     busca ayuda: conversa con alguien de confianza o con un profesional de la salud.</p>
+
+  <h2>8. Cambios a estos términos</h2>
+  <p>Podemos actualizar estos términos. Si el cambio es importante, lo avisaremos en la página.</p>
+
+  <h2>9. Ley aplicable y contacto</h2>
+  <p>Estos términos se rigen por las leyes de Chile. Para cualquier consulta, escríbenos a
+     <a href="mailto:pronostika.chile@gmail.com">pronostika.chile@gmail.com</a>.</p>
+
+  <p class="tenue pequeno">Ver también la <a href="{% url 'privacidad' %}">Política de privacidad</a>.</p>
+</article>
+{% endblock %}
