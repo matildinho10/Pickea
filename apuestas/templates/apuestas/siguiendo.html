@@ -44,14 +44,20 @@
     {% empty %}
       <p class="vacio relleno pequeno">No tiene apuestas abiertas en este momento.</p>
     {% endfor %}
-    <div class="subtitulo-grupos">Últimas resueltas</div>
-    {% for g in e.grupos %}
-      {% include 'apuestas/_grupo_apuestas.html' %}
-    {% empty %}
-      <p class="vacio relleno pequeno">Todavía no tiene apuestas resueltas en este período.</p>
-    {% endfor %}
   </div>
-  <a class="tipster-pie fuerte" href="{% url 'perfil' e.usuario.username %}">Ver perfil completo →</a>
+  {# Las últimas resueltas quedan escondidas hasta tocar "Mostrar más" #}
+  <details class="mostrar-mas">
+    <summary><span class="texto-cerrado">Mostrar más</span><span class="texto-abierto">Mostrar menos</span></summary>
+    <div class="lista-grupos">
+      <div class="subtitulo-grupos">Últimas resueltas</div>
+      {% for g in e.grupos %}
+        {% include 'apuestas/_grupo_apuestas.html' %}
+      {% empty %}
+        <p class="vacio relleno pequeno">Todavía no tiene apuestas resueltas en este período.</p>
+      {% endfor %}
+    </div>
+    <a class="tipster-pie fuerte" href="{% url 'perfil' e.usuario.username %}">Ver perfil completo →</a>
+  </details>
 </article>
 {% empty %}
 <div class="tarjeta relleno">

@@ -878,3 +878,19 @@ th.col-pos { font-family: var(--cuerpo); }
   /* En celular, el aviso va debajo del nombre para no empujar las columnas */
   .chip-abiertas { display: table; margin: 2px 0 0 34px; padding: 1px 6px; font-size: 11px; }
 }
+
+/* ---------- "Mostrar más" en Siguiendo ---------- */
+.mostrar-mas { border-top: 1px solid var(--linea); }
+.mostrar-mas summary {
+  display: flex; align-items: center; gap: 6px; padding: 12px 24px; cursor: pointer; list-style: none;
+  font-size: 14px; font-weight: 600; color: var(--acento);
+}
+.mostrar-mas summary::-webkit-details-marker { display: none; }
+.mostrar-mas summary::after { content: "▾"; transition: transform 0.15s; }
+.mostrar-mas[open] summary::after { transform: rotate(180deg); }
+.mostrar-mas summary:hover { background: var(--fondo-suave); }
+.mostrar-mas .texto-abierto, .mostrar-mas[open] .texto-cerrado { display: none; }
+.mostrar-mas[open] .texto-abierto { display: inline; }
+.mostrar-mas .lista-grupos { border-top: 1px solid var(--linea); }
+@media (max-width: 700px) { .mostrar-mas summary { padding: 12px; } }
+
