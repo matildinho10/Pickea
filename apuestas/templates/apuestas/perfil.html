@@ -151,11 +151,23 @@
   {% endif %}
 </section>
 
+<section id="abiertas" class="tarjeta lista-grupos" aria-labelledby="titulo-abiertas">
+  <div class="seccion-cabecera">
+    <h2 id="titulo-abiertas">Apuestas abiertas{% if abiertas %} <span class="contador-titulo">{{ abiertas|length }} partido{{ abiertas|length|pluralize }}</span>{% endif %}</h2>
+    <div class="tenue pequeno">Todavía sin resolver · las más próximas primero</div>
+  </div>
+  {% for g in abiertas %}
+    {% include 'apuestas/_grupo_apuestas.html' %}
+  {% empty %}
+    <p class="vacio relleno">No tiene apuestas abiertas en este momento.</p>
+  {% endfor %}
+</section>
+
 <section class="tarjeta lista-grupos" aria-labelledby="titulo-ultimas">
   <div class="seccion-cabecera">
-    <h2 id="titulo-ultimas">Últimas apuestas</h2>
+    <h2 id="titulo-ultimas">Últimas apuestas resueltas</h2>
     <div class="tenue pequeno">
-      Agrupadas por partido · solo apuestas ya decididas
+      Agrupadas por partido
       {% if es_mio %} · <a class="fuerte" href="{% url 'mis_apuestas' %}?vista=historial">Ver todas</a>{% endif %}
     </div>
   </div>

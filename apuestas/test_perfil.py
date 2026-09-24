@@ -46,7 +46,11 @@ class PerfilTests(TestCase):
         self.assertContains(r, '+14.3%')                      # ROI = (4 - 3) / (4 + 3)
         self.assertContains(r, 'Aún no entra al ranking')
         self.assertContains(r, 'E0 vs E1')
-        self.assertNotContains(r, 'E4 vs E5')                 # la apuesta activa no se muestra
+        self.assertContains(r, 'E4 vs E5')                    # la apuesta abierta es pública
+        self.assertEqual(len(r.context['abiertas']), 1)
+        self.assertContains(r, 'id="abiertas"')
+        # En el ranking aparece cuántas apuestas abiertas tiene
+        self.assertContains(self.client.get('/?bajo=1'), '1 abierta<')
         g = r.context['grafico']
         self.assertEqual([d['a'] for d in g['datos']], [0, 4, 1])
         self.assertEqual(g['n_partidos'], 2)

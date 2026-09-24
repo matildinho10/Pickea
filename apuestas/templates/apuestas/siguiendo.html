@@ -7,7 +7,7 @@
 <div class="encabezado">
   <div class="encabezado-texto">
     <h1>Siguiendo</h1>
-    <p>Los tipsters que sigues, ordenados por p-value, con sus últimas apuestas ya decididas.</p>
+    <p>Los tipsters que sigues, ordenados por p-value, con sus apuestas abiertas y las últimas resueltas.</p>
   </div>
   {% if temporada and tipsters %}
   <nav class="pestanas" aria-label="Período">
@@ -38,10 +38,17 @@
   </header>
 
   <div class="lista-grupos">
+    <div class="subtitulo-grupos">Apuestas abiertas{% if e.abiertas %} · {{ e.abiertas|length }} partido{{ e.abiertas|length|pluralize }}{% endif %}</div>
+    {% for g in e.abiertas %}
+      {% include 'apuestas/_grupo_apuestas.html' %}
+    {% empty %}
+      <p class="vacio relleno pequeno">No tiene apuestas abiertas en este momento.</p>
+    {% endfor %}
+    <div class="subtitulo-grupos">Últimas resueltas</div>
     {% for g in e.grupos %}
       {% include 'apuestas/_grupo_apuestas.html' %}
     {% empty %}
-      <p class="vacio relleno">Todavía no tiene apuestas decididas en este período.</p>
+      <p class="vacio relleno pequeno">Todavía no tiene apuestas resueltas en este período.</p>
     {% endfor %}
   </div>
   <a class="tipster-pie fuerte" href="{% url 'perfil' e.usuario.username %}">Ver perfil completo →</a>
@@ -54,7 +61,4 @@
 </div>
 {% endfor %}
 
-{% if tipsters %}
-<p class="tenue pequeno">Solo se muestran apuestas ya decididas: las que están abiertas no se ven, para que nadie copie picks antes del partido.</p>
-{% endif %}
 {% endblock %}

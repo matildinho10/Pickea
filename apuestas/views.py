@@ -10,7 +10,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Prefetch, Sum
+from django.db.models import Count, Prefetch, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -52,6 +52,10 @@ def ranking(request):
     en_ranking, bajo_minimo = calcular_ranking(filtro)
     en_ranking.sort(key=criterio)
     bajo_minimo.sort(key=criterio)
+    abiertas = dict(Apuesta.objects.filter(opcion__resultado=Opcion.Resultado.PENDIENTE)
+                    .values_list('usuario').annotate(n=Count('id')))
+    for e in en_ranking + bajo_minimo:
+        e.abiertas = abiertas.get(e.usuario.pk, 0)
     for puesto, e in enumerate(en_ranking, 1):
         e.puesto = puesto
 
@@ -342,7 +346,6 @@ class CambiarClaveView(auth_views.PasswordChangeView):
 def ultimas_decididas(usuario, temporada=None, partidos=8):
     """
     Apuestas ya decididas de los últimos partidos de un usuario, agrupadas por partido.
-    No se muestran las activas, para que nadie copie picks que todavía están abiertos.
     """
     decididas = (Apuesta.objects.filter(usuario=usuario)
                  .exclude(opcion__resultado=Opcion.Resultado.PENDIENTE)
@@ -353,6 +356,14 @@ def ultimas_decididas(usuario, temporada=None, partidos=8):
                    .distinct().order_by('-inicio', '-pk')[:partidos])
     return agrupar_por_partido(decididas.filter(opcion__mercado__partido__in=ultimos)
                                .order_by('-opcion__mercado__partido__inicio', 'creada'))
+
+
+def apuestas_abiertas(usuario):
+    """Apuestas todavía sin resolver de un usuario (públicas), agrupadas por partido, las más próximas primero."""
+    return agrupar_por_partido(
+        Apuesta.objects.filter(usuario=usuario, opcion__resultado=Opcion.Resultado.PENDIENTE)
+        .select_related('opcion__mercado__partido__local', 'opcion__mercado__partido__visita')
+        .order_by('opcion__mercado__partido__inicio', 'creada'))
 
 
 def perfil(request, username):
@@ -367,6 +378,7 @@ def perfil(request, username):
         puesto = next((i for i, e in enumerate(en_ranking, 1) if e.usuario == usuario), None)
 
     grupos = ultimas_decididas(usuario, filtro, partidos=8)
+    abiertas = apuestas_abiertas(usuario)
 
     return render(request, 'apuestas/perfil.html', {
         'seccion': 'perfil' if request.user == usuario else None,
@@ -379,6 +391,7 @@ def perfil(request, username):
         'minimo': MINIMO_PARTIDOS_EFECTIVOS,
         'grafico': grafico.preparar(stats.serie),
         'grupos': grupos,
+        'abiertas': abiertas,
         'n_seguidores': usuario.seguidores.count(),
         'n_siguiendo': usuario.seguimientos.count(),
         'lo_sigo': request.user.is_authenticated and request.user.sigue_a(usuario),
@@ -399,12 +412,13 @@ def seguir(request, username):
 
 @login_required
 def siguiendo(request):
-    """Los tipsters que sigues: sus números y sus últimas apuestas decididas."""
+    """Los tipsters que sigues: sus números, sus apuestas abiertas y las últimas decididas."""
     temporada, periodo, filtro = periodo_elegido(request)
     tipsters = []
     for usuario in Usuario.objects.filter(seguidores__seguidor=request.user).order_by('username'):
         stats = estadisticas_usuario(usuario, filtro)
         stats.grupos = ultimas_decididas(usuario, filtro, partidos=3)
+        stats.abiertas = apuestas_abiertas(usuario)
         tipsters.append(stats)
     tipsters.sort(key=ORDENES_RANKING['pvalue'][1])
     return render(request, 'apuestas/siguiendo.html', {

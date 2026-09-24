@@ -17,7 +17,8 @@
       {% for e in filas %}
       <tr>
         <td class="col-pos">{% if numerar %}{{ e.puesto }}{% else %}—{% endif %}</td>
-        <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">{% include 'apuestas/_avatar.html' with u=e.usuario tamano='chico' %}<span>@{{ e.usuario.username }}</span></a></td>
+        <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">{% include 'apuestas/_avatar.html' with u=e.usuario tamano='chico' %}<span>@{{ e.usuario.username }}</span></a>{% if e.abiertas %}
+          <a class="chip-abiertas" href="{% url 'perfil' e.usuario.username %}#abiertas" title="Apuestas abiertas: todavía sin resolver">{{ e.abiertas }} abierta{{ e.abiertas|pluralize }}</a>{% endif %}</td>
         <td class="num mono col-opcional-chica">{{ e.partidos_efectivos|floatformat:0 }}</td>
         <td class="num mono tenue col-opcional">{{ e.apuestas }}</td>
         <td class="num mono fuerte {% if orden == 'ganancia' %}col-opcional-chica {% endif %}{{ e.roi|tono }}">{{ e.roi|porcentaje }}</td>

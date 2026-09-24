@@ -859,3 +859,22 @@ th.col-pos { font-family: var(--cuerpo); }
   .tabla-ranking .enlace-usuario { gap: 6px; }
   .tabla-ranking .enlace-usuario span { display: inline-block; max-width: 28vw; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 }
+
+/* ---------- Apuestas abiertas ---------- */
+.chip-abiertas {
+  display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px;
+  background: #F4E9C8; color: #5C4A12; font-size: 12px; font-weight: 600; text-decoration: none;
+  vertical-align: middle; white-space: nowrap;
+}
+.chip-abiertas:hover { background: #EBDCAE; color: #5C4A12; }
+.contador-titulo { font-family: var(--cuerpo); font-size: 14px; font-weight: 600; color: var(--gris); margin-left: 6px; }
+.subtitulo-grupos {
+  padding: 10px 24px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--gris); border-top: 1px solid var(--linea);
+}
+.subtitulo-grupos:first-child { border-top: none; }
+@media (max-width: 700px) { .subtitulo-grupos { padding: 10px 12px; } }
+@media (max-width: 520px) {
+  /* En celular, el aviso va debajo del nombre para no empujar las columnas */
+  .chip-abiertas { display: table; margin: 2px 0 0 34px; padding: 1px 6px; font-size: 11px; }
+}
