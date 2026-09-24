@@ -37,6 +37,12 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    # En internet, cada versión de estilos.css / *.js recibe un nombre distinto
+    # (p. ej. estilos.3f9a1c.css). Así los navegadores no usan copias viejas.
+    STORAGES = {
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'},
+    }
 
 
 # Application definition
