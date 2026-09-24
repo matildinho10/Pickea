@@ -1,0 +1,182 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Cómo funciona{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <div class="encabezado-texto">
+    <h1>Cómo funciona</h1>
+    <p>Todo lo que necesitas para apostar y entender el ranking, explicado en simple.</p>
+  </div>
+</div>
+
+<div class="guia">
+  <nav class="guia-indice tarjeta" aria-label="Contenido de la guía">
+    <div class="antetitulo">Contenido</div>
+    <ol>
+      <li><a href="#que-es">Qué es {{ NOMBRE_SITIO }}</a></li>
+      <li><a href="#apostar">Cómo apostar</a></li>
+      <li><a href="#unidades">Unidades y ganancia</a></li>
+      <li><a href="#cuotas">Cuotas</a></li>
+      <li><a href="#mercados">Tipos de apuesta</a></li>
+      <li><a href="#roi">ROI</a></li>
+      <li><a href="#partidos-efectivos">Partidos efectivos</a></li>
+      <li><a href="#p-value">p-value</a></li>
+      <li><a href="#clv">CLV</a></li>
+      <li><a href="#ranking">El ranking</a></li>
+    </ol>
+  </nav>
+
+  <div class="guia-contenido">
+    <section id="que-es" class="tarjeta guia-seccion">
+      <h2>Qué es {{ NOMBRE_SITIO }}</h2>
+      <p>Un simulador de apuestas del fútbol chileno. <strong>No se juega con dinero:</strong> apuestas unidades
+         ficticias con cuotas reales del mercado, y la página mide qué tan bien eliges.</p>
+      <p>La gracia está en el ranking: no premia al que tuvo una buena racha, sino al que tiene resultados
+         <strong>difíciles de explicar solo con suerte</strong>.</p>
+    </section>
+
+    <section id="apostar" class="tarjeta guia-seccion">
+      <h2>Cómo apostar</h2>
+      <ol>
+        <li>Entra a <a href="{% url 'partidos' %}">Partidos</a> y toca la cuota que quieres. Si tocas el nombre de los equipos, se abren más tipos de apuesta.</li>
+        <li>Elige de 1 a 10 unidades según tu confianza.</li>
+        <li>Presiona <strong>Confirmar apuesta</strong>.</li>
+      </ol>
+      <p>Dos reglas importantes:</p>
+      <ul>
+        <li><strong>La cuota queda fija al confirmar.</strong> Si después el mercado la cambia, tu apuesta mantiene la que tenía cuando confirmaste.</li>
+        <li><strong>Las apuestas se cierran al inicio del partido.</strong></li>
+      </ul>
+    </section>
+
+    <section id="unidades" class="tarjeta guia-seccion">
+      <h2>Unidades y ganancia</h2>
+      <p>Una unidad es la medida de cada apuesta. No hay saldo: siempre puedes apostar de 1 a 10 unidades, así que
+         nadie queda fuera por una mala racha. Más unidades significa más confianza.</p>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Ejemplo</div>
+        <p>Apuestas <strong>3 unidades</strong> a una cuota de <strong>2.50</strong>:</p>
+        <ul>
+          <li>Si aciertas: ganas 3 × (2.50 − 1) = <span class="mono positivo">+4.5 u</span></li>
+          <li>Si fallas: pierdes lo apostado, <span class="mono negativo">−3 u</span></li>
+        </ul>
+      </div>
+      <p>La <strong>ganancia</strong> de un usuario es la suma de lo que ganó y perdió en todas sus apuestas.</p>
+      <p id="nulas">Algunas apuestas pueden terminar <strong>nulas</strong>, por ejemplo "Empate no válido" cuando el partido
+         termina empatado. En ese caso se devuelven las unidades: ni ganas ni pierdes, y esa apuesta no cuenta en las estadísticas.</p>
+    </section>
+
+    <section id="cuotas" class="tarjeta guia-seccion">
+      <h2>Cuotas</h2>
+      <p>La cuota dice cuánto te devuelven por cada unidad si aciertas, y también qué tan probable cree el mercado que es algo.
+         Para convertirla en probabilidad: <strong>1 ÷ cuota</strong>.</p>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Ejemplo</div>
+        <ul>
+          <li>Cuota <span class="mono">1.50</span> → 1 ÷ 1.50 = 67%: el mercado lo ve muy probable.</li>
+          <li>Cuota <span class="mono">4.00</span> → 1 ÷ 4.00 = 25%: poco probable, por eso paga más.</li>
+        </ul>
+      </div>
+      <p>Si sumas las probabilidades de todas las opciones de un mercado, da un poco más de 100%. Esa diferencia
+         es el <strong>margen de la casa</strong>: por eso, apostando al azar, a la larga se pierde un poco.</p>
+      <p>La <strong>cuota promedio</strong> del perfil es el promedio de las cuotas a las que apostó un usuario. Una cuota
+         promedio alta indica que apuesta a opciones menos probables, que aciertan menos pero pagan más.</p>
+    </section>
+
+    <section id="mercados" class="tarjeta guia-seccion">
+      <h2>Tipos de apuesta</h2>
+      <dl class="lista-mercados">
+        <dt>Resultado (1 X 2)</dt><dd><strong>1</strong> gana el local, <strong>X</strong> empate, <strong>2</strong> gana la visita.</dd>
+        <dt>Goles 2.5 (Más / Menos)</dt><dd>Si habrá 3 o más goles en total (Más) o 2 o menos (Menos). También hay líneas de 1.5 y 3.5.</dd>
+        <dt>Doble oportunidad</dt><dd>Cubres dos de los tres resultados: <strong>1X</strong> (local o empate), <strong>12</strong> (cualquiera gana), <strong>X2</strong> (empate o visita).</dd>
+        <dt>Empate no válido</dt><dd>Eliges quién gana; si hay empate, se devuelve la apuesta.</dd>
+        <dt>Ambos marcan</dt><dd>Si los dos equipos harán al menos un gol.</dd>
+        <dt>Resultado al descanso</dt><dd>Como el 1 X 2, pero con el marcador del primer tiempo.</dd>
+        <dt>Córners 9.5 / Tarjetas 4.5</dt><dd>Si habrá más o menos córners (o tarjetas) que esa cantidad en el partido.</dd>
+      </dl>
+    </section>
+
+    <section id="roi" class="tarjeta guia-seccion">
+      <h2>ROI</h2>
+      <p>El ROI (retorno sobre la inversión) dice cuánto ganó un usuario <strong>por cada unidad apostada</strong>.
+         Permite comparar a gente que apuesta mucho con gente que apuesta poco.</p>
+      <p class="formula">ROI = ganancia ÷ unidades apostadas</p>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Ejemplo</div>
+        <p>Si apostaste 200 unidades en total y vas ganando 15, tu ROI es 15 ÷ 200 = <span class="mono positivo">+7.5%</span>.</p>
+      </div>
+      <p>Ojo: un ROI alto con pocas apuestas puede ser pura suerte. Para eso existe el <a href="#p-value">p-value</a>.</p>
+    </section>
+
+    <section id="partidos-efectivos" class="tarjeta guia-seccion">
+      <h2>Partidos efectivos</h2>
+      <p>Cuenta en <strong>cuántos partidos se basa realmente</strong> el resultado de un usuario, considerando cuántas
+         unidades puso en cada uno. Si apuestas lo mismo en todos los partidos, es igual al número de partidos; si
+         concentras muchas unidades en pocos, baja.</p>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Ejemplo</div>
+        <ul>
+          <li><strong>Ana</strong> apuesta 2 unidades en cada uno de 10 partidos → <strong>10</strong> partidos efectivos.</li>
+          <li><strong>Beto</strong> apuesta 1 unidad en 9 partidos y 10 en uno solo → <strong>3.3</strong> partidos efectivos: su resultado depende casi entero de ese partido.</li>
+        </ul>
+      </div>
+      <p>Varias apuestas en un mismo partido cuentan como un solo partido. Se necesitan al menos
+         <strong>30 partidos efectivos</strong> para entrar al ranking.</p>
+    </section>
+
+    <section id="p-value" class="tarjeta guia-seccion">
+      <h2>p-value</h2>
+      <p>Es la medida principal del ranking. Responde: <strong>si este usuario no supiera nada más que el mercado,
+         ¿qué probabilidad había de que le fuera así de bien, o mejor, solo por suerte?</strong></p>
+      <p>Mientras <strong>más bajo</strong>, más difícil es explicar su resultado con suerte, y más evidencia hay de que sabe.</p>
+      <div class="tabla-contenedor">
+        <table class="tabla-guia">
+          <thead><tr><th scope="col">p-value</th><th scope="col">Qué significa</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0.50</td><td>Nada fuera de lo común: la mitad de la gente sin ventaja lo lograría.</td></tr>
+            <tr><td class="mono">0.20</td><td>Buen resultado, pero 1 de cada 5 lo lograría por suerte.</td></tr>
+            <tr><td class="mono positivo">0.05</td><td>Solo 1 de cada 20 lo lograría por suerte. Desde aquí se marca en verde.</td></tr>
+            <tr><td class="mono positivo">0.01</td><td>1 de cada 100. Evidencia fuerte de habilidad.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Por qué no basta con el ROI</div>
+        <p>Alguien que acierta 3 apuestas a cuota 5.00 tiene un ROI enorme, pero con tan pocas apuestas eso le puede
+           pasar a cualquiera: su p-value será alto. Alguien con un ROI más modesto, pero sostenido en 200 partidos, tendrá
+           un p-value mucho más bajo.</p>
+      </div>
+      <p>Un usuario que va perdiendo tiene un p-value mayor a 0.50. Con pocos partidos, el p-value es poco confiable;
+         por eso se exige el mínimo de 30 partidos efectivos.</p>
+    </section>
+
+    <section id="clv" class="tarjeta guia-seccion">
+      <h2>CLV (valor contra el cierre)</h2>
+      <p>La <strong>cuota de cierre</strong> es la que tiene una opción justo cuando empieza el partido. Como a esa hora el mercado
+         ya sabe todo (lesiones, alineaciones, clima), se considera la estimación más precisa.</p>
+      <p>El CLV compara la cuota a la que apostaste con la de cierre. Si apostaste a una cuota <strong>más alta</strong> que la de
+         cierre, conseguiste un precio mejor que el mercado final: te adelantaste.</p>
+      <p class="formula">CLV = cuota apostada ÷ cuota de cierre − 1</p>
+      <div class="ejemplo">
+        <div class="ejemplo-titulo">Ejemplo</div>
+        <p>Apostaste a Colo-Colo a <span class="mono">2.10</span> el jueves, y el domingo cerró en <span class="mono">1.90</span>:
+           CLV = 2.10 ÷ 1.90 − 1 = <span class="mono positivo">+10.5%</span>.</p>
+      </div>
+      <p>¿Por qué importa? Los resultados dependen mucho de la suerte, pero conseguir sistemáticamente cuotas mejores que las de
+         cierre es muy difícil sin saber. Un CLV positivo sostenido es una buena señal, aunque el usuario tenga una mala racha.
+         En el perfil se muestra el promedio, ponderado por las unidades de cada apuesta.</p>
+    </section>
+
+    <section id="ranking" class="tarjeta guia-seccion">
+      <h2>El ranking</h2>
+      <ul>
+        <li>Está ordenado por <a href="#p-value">p-value</a>, de menor a mayor: arriba quedan los resultados más difíciles de explicar con suerte.</li>
+        <li>Para aparecer se necesitan al menos <strong>30 partidos efectivos</strong>. Los demás se ven en "Ver usuarios bajo el mínimo".</li>
+        <li><strong>Temporada</strong> cuenta solo las apuestas de este año; <strong>Histórico</strong>, todas.</li>
+        <li>En <strong>Siguiendo</strong> ves solo a los tipsters que sigues. Para seguir a alguien, entra a su perfil y presiona <strong>Seguir</strong>.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

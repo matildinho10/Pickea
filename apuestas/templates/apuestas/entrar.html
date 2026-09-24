@@ -5,12 +5,13 @@
 {% block contenido %}
 <div class="tarjeta formulario">
   <h1>Entrar</h1>
+  {% if motivo %}<div class="mensaje mensaje-info" role="status">{{ motivo }}</div>{% endif %}
   <form method="post">
     {% csrf_token %}
     {% include 'apuestas/_formulario.html' %}
     <input type="hidden" name="next" value="{{ next }}">
     <button type="submit" class="boton-principal">Entrar</button>
   </form>
-  <p class="tenue">¿No tienes cuenta? <a href="{% url 'registro' %}">Créala aquí</a>.</p>
+  <p class="tenue">¿No tienes cuenta? <a href="{% url 'registro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Créala gratis aquí</a>.</p>
 </div>
 {% endblock %}

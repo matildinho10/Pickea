@@ -275,6 +275,7 @@ th.col-pos { font-family: var(--cuerpo); }
 .mensaje { padding: 12px 14px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
 .mensaje-success { background: #E4EFE6; color: #1C4A2C; }
 .mensaje-error { background: #F6E1DE; color: #7E1A14; }
+.mensaje-info { background: #F4E9C8; color: #5C4A12; font-weight: 600; }
 
 /* ---------- Página de partidos ---------- */
 .layout-partidos {
@@ -533,7 +534,10 @@ th.col-pos { font-family: var(--cuerpo); }
   .barra-izq { display: contents; }
   .marca { order: 1; }
   .barra-der { order: 2; padding-bottom: 0; gap: 12px; }
-  .nav { order: 3; flex-basis: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 -10px; }
+  .nav { order: 3; flex-basis: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 -10px; padding-right: 32px;
+         /* degradado a la derecha: avisa que hay más pestañas al deslizar */
+         -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+         mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent); }
   .nav a { white-space: nowrap; min-height: 48px; }
   .etiqueta-ejemplo { display: none; }
 }
@@ -559,6 +563,7 @@ th.col-pos { font-family: var(--cuerpo); }
    ============================================================ */
 .perfil-cabecera { display: flex; align-items: center; gap: 20px; }
 .avatar {
+  object-fit: cover;   /* para las fotos: llenan el círculo sin deformarse */
   flex-shrink: 0;
   width: 72px;
   height: 72px;
@@ -592,7 +597,6 @@ th.col-pos { font-family: var(--cuerpo); }
   text-transform: uppercase;
   color: var(--nav-inactivo);
 }
-.evidencia-numeros { display: flex; gap: 40px; }
 .evidencia-etiqueta { font-size: 14px; color: var(--nav-inactivo); }
 .evidencia-valor { font-family: var(--mono); font-size: 48px; font-weight: 600; line-height: 1.1; }
 .evidencia-valor.significativo { color: #8FCB9B; }
@@ -690,4 +694,92 @@ th.col-pos { font-family: var(--cuerpo); }
   .seccion-perfil { padding: 16px; }
   .lista-grupos .seccion-cabecera { padding: 16px 12px 10px; }
   .grafico { grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: 180px auto; column-gap: 8px; }
+}
+
+/* ============================================================
+   Fotos, seguir, ayuda "?" y guía
+   ============================================================ */
+.avatar-chico { width: 28px; height: 28px; font-size: 12px; font-family: var(--cuerpo); font-weight: 600; }
+.enlace-usuario, .usuario-actual { display: inline-flex; align-items: center; gap: 10px; }
+
+.grupo-pestanas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.perfil-social { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 6px; font-size: 14px; }
+.perfil-social form { margin: 0; }
+.boton-seguir, .boton-secundario {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton-seguir { border: none; background: var(--acento); color: var(--blanco); }
+.boton-seguir:hover { background: var(--acento-hover); color: var(--blanco); }
+.boton-secundario { border: 1px solid #CFC9BA; background: var(--blanco); color: var(--texto); }
+.boton-secundario:hover { border-color: var(--texto); color: var(--texto); }
+.boton-secundario.siguiendo { color: var(--positivo); border-color: var(--positivo); }
+.boton-texto { border: none; background: none; padding: 0; font: inherit; font-size: 14px; font-weight: 600; color: var(--acento); cursor: pointer; text-decoration: underline; }
+
+.ayuda-q {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 2px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  vertical-align: 1px;
+  color: var(--gris);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.ayuda-q:hover { color: var(--acento); }
+.ayuda-q-oscuro { color: var(--nav-inactivo); }
+.ayuda-q-oscuro:hover { color: var(--blanco); }
+
+.foto-actual { display: flex; align-items: center; gap: 16px; }
+.campo input[type=file] { height: auto; padding: 10px 12px; }
+
+.guia { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; align-items: start; }
+.guia-indice { position: sticky; top: 16px; padding: 20px; }
+.guia-indice ol { margin: 10px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.guia-indice a { text-decoration: none; font-weight: 500; }
+.guia-contenido { display: flex; flex-direction: column; gap: 16px; }
+.guia-seccion { padding: 24px 28px; scroll-margin-top: 16px; }
+.guia-seccion h2 { margin: 0 0 12px; font-family: var(--titulos); font-size: 30px; font-weight: 700; line-height: 1.1; }
+.guia-seccion p, .guia-seccion ul, .guia-seccion ol { margin: 0 0 12px; max-width: 70ch; }
+.guia-seccion > :last-child { margin-bottom: 0; }
+.guia-seccion li + li { margin-top: 4px; }
+.ejemplo { margin: 4px 0 14px; padding: 14px 18px; background: var(--fondo-suave); border-left: 3px solid var(--acento); border-radius: 0 8px 8px 0; }
+.ejemplo p, .ejemplo ul { margin: 0; }
+.ejemplo-titulo { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gris); margin-bottom: 6px; }
+.formula { font-family: var(--mono); font-weight: 600; padding: 10px 14px; background: var(--fondo-suave); border-radius: 8px; display: inline-block; }
+.lista-mercados { margin: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 10px 20px; }
+.lista-mercados dt { font-weight: 600; }
+.lista-mercados dd { margin: 0; color: var(--gris-oscuro); }
+.tabla-guia { width: 100%; max-width: 640px; border-collapse: collapse; margin: 4px 0 14px; font-size: 14px; }
+.tabla-guia th { white-space: nowrap; text-align: left; padding: 8px 10px; background: var(--fondo-suave); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gris); }
+.tabla-guia td { padding: 8px 10px; border-top: 1px solid var(--linea); vertical-align: top; }
+
+@media (max-width: 900px) {
+  .guia { grid-template-columns: minmax(0, 1fr); }
+  .guia-indice { position: static; }
+  .guia-indice ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lista-mercados { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .lista-mercados dd { margin-bottom: 10px; }
+}
+@media (max-width: 600px) {
+  .guia-seccion { padding: 18px 16px; }
+  .guia-seccion h2 { font-size: 26px; }
+  .usuario-actual span { display: none; }   /* en celular, solo la foto */
 }

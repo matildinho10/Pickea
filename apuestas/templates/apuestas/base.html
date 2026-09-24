@@ -16,16 +16,16 @@
       <nav aria-label="Principal" class="nav">
         <a href="{% url 'ranking' %}" {% if seccion == 'ranking' %}aria-current="page"{% endif %}>Ranking</a>
         <a href="{% url 'partidos' %}" {% if seccion == 'partidos' %}aria-current="page"{% endif %}>Partidos</a>
-        {% if user.is_authenticated %}
-          <a href="{% url 'mis_apuestas' %}" {% if seccion == 'mis_apuestas' %}aria-current="page"{% endif %}>Mis apuestas</a>
-          <a href="{% url 'perfil' user.username %}" {% if seccion == 'perfil' %}aria-current="page"{% endif %}>Mi perfil</a>
-        {% endif %}
+        {# Se ven siempre; sin sesión, al tocarlos te piden entrar #}
+        <a href="{% url 'mis_apuestas' %}" {% if seccion == 'mis_apuestas' %}aria-current="page"{% endif %}>Mis apuestas</a>
+        <a href="{% url 'mi_perfil' %}" {% if seccion == 'perfil' %}aria-current="page"{% endif %}>Mi perfil</a>
+        <a href="{% url 'como_funciona' %}" {% if seccion == 'guia' %}aria-current="page"{% endif %}>Cómo funciona</a>
       </nav>
     </div>
     <div class="barra-der">
       {% if DATOS_DE_EJEMPLO %}<span class="etiqueta-ejemplo">Datos de ejemplo</span>{% endif %}
       {% if user.is_authenticated %}
-        <a class="usuario-actual" href="{% url 'perfil' user.username %}">@{{ user.username }}</a>
+        <a class="usuario-actual" href="{% url 'perfil' user.username %}">{% include 'apuestas/_avatar.html' with u=user tamano='chico' %}<span>@{{ user.username }}</span></a>
         <form method="post" action="{% url 'salir' %}">
           {% csrf_token %}
           <button type="submit" class="boton-barra">Salir</button>
@@ -45,6 +45,10 @@
     {% endif %}
     {% block contenido %}{% endblock %}
   </main>
+  <script>
+    // En celular, si la pestaña actual quedó fuera de la vista, desliza la barra para mostrarla
+    document.querySelector('.nav [aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

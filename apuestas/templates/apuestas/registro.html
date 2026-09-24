@@ -9,8 +9,9 @@
   <form method="post">
     {% csrf_token %}
     {% include 'apuestas/_formulario.html' %}
+    <input type="hidden" name="next" value="{{ next }}">
     <button type="submit" class="boton-principal">Crear cuenta</button>
   </form>
-  <p class="tenue">¿Ya tienes cuenta? <a href="{% url 'entrar' %}">Entra aquí</a>.</p>
+  <p class="tenue">¿Ya tienes cuenta? <a href="{% url 'entrar' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Entra aquí</a>.</p>
 </div>
 {% endblock %}

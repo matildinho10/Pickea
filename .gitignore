@@ -11,3 +11,6 @@ staticfiles/
 
 # Claves secretas (nunca a GitHub)
 .env
+
+# Fotos que suben los usuarios (viven en el servidor, no en GitHub)
+media/

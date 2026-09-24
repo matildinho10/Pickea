@@ -4,6 +4,7 @@ Buscan los datos y se los pasan a una plantilla HTML (carpeta templates/).
 """
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
@@ -11,12 +12,15 @@ from django.db.models import Prefetch, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .estadisticas import MINIMO_PARTIDOS_EFECTIVOS, estadisticas_usuario, ranking as calcular_ranking
 from . import grafico
-from .forms import RegistroForm
-from .models import MERCADOS, Apuesta, Mercado, Opcion, Partido, Temporada, Usuario, fijar_cierres_pendientes
+from .fotos import procesar_foto
+from .forms import FotoForm, RegistroForm
+from .models import (MERCADOS, Apuesta, Mercado, Opcion, Partido, Seguimiento, Temporada, Usuario,
+                     fijar_cierres_pendientes)
 
 ORDEN_MERCADOS = list(MERCADOS)
 
@@ -24,14 +28,28 @@ ORDEN_MERCADOS = list(MERCADOS)
 def ranking(request):
     temporada = Temporada.objects.filter(activa=True).first()
     periodo = 'historico' if request.GET.get('periodo') == 'historico' or temporada is None else 'temporada'
+    siguiendo = request.GET.get('ver') == 'siguiendo' and request.user.is_authenticated
     en_ranking, bajo_minimo = calcular_ranking(temporada if periodo == 'temporada' else None)
+    for puesto, e in enumerate(en_ranking, 1):
+        e.puesto = puesto   # puesto en el ranking completo, aunque después filtremos
+
+    n_siguiendo = 0
+    if siguiendo:
+        ids = set(request.user.seguimientos.values_list('seguido_id', flat=True))
+        n_siguiendo = len(ids)
+        en_ranking = [e for e in en_ranking if e.usuario.pk in ids]
+        bajo_minimo = [e for e in bajo_minimo if e.usuario.pk in ids]
+
     return render(request, 'apuestas/ranking.html', {
         'seccion': 'ranking',
         'temporada': temporada,
         'periodo': periodo,
+        'ver': 'siguiendo' if siguiendo else 'todos',
+        'n_siguiendo': n_siguiendo,
         'en_ranking': en_ranking,
         'bajo_minimo': bajo_minimo,
-        'ver_bajo_minimo': 'bajo' in request.GET,
+        # En "Siguiendo" se muestran siempre, porque son pocos y los elegiste tú
+        'ver_bajo_minimo': 'bajo' in request.GET or siguiendo,
         'minimo': MINIMO_PARTIDOS_EFECTIVOS,
     })
 
@@ -178,17 +196,57 @@ def mis_apuestas(request):
     })
 
 
+# Qué decirle a alguien que llegó a "Entrar" porque intentó usar algo que requiere sesión
+MOTIVOS_PARA_ENTRAR = [
+    ('/mis-apuestas/', 'Inicia sesión para ver tus apuestas.'),
+    ('/mi-perfil/', 'Inicia sesión para ver tu perfil.'),
+    ('/cuenta/', 'Inicia sesión para editar tu perfil.'),
+    ('/partidos/', 'Inicia sesión para apostar.'),
+    ('/apostar/', 'Inicia sesión para apostar.'),
+    ('/u/', 'Inicia sesión para seguir a otros tipsters.'),
+]
+
+
+def destino_seguro(request):
+    """La página a la que quería ir (?next=...), solo si es de este mismo sitio."""
+    destino = request.POST.get('next') or request.GET.get('next') or ''
+    if url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()},
+                                       require_https=request.is_secure()):
+        return destino
+    return ''
+
+
+def motivo_para_entrar(destino):
+    return next((texto for inicio, texto in MOTIVOS_PARA_ENTRAR if destino.startswith(inicio)), '')
+
+
+class EntrarView(auth_views.LoginView):
+    template_name = 'apuestas/entrar.html'
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        contexto['motivo'] = motivo_para_entrar(destino_seguro(self.request))
+        return contexto
+
+
+@login_required
+def mi_perfil(request):
+    """'Mi perfil' en la barra: sirve también sin sesión (primero te pide entrar)."""
+    return redirect('perfil', username=request.user.username)
+
+
 def registro(request):
+    destino = destino_seguro(request)
     if request.method == 'POST':
         form = RegistroForm(request.POST)
         if form.is_valid():
             usuario = form.save()
             login(request, usuario)
             messages.success(request, f'¡Bienvenido, @{usuario.username}! Ya puedes apostar.')
-            return redirect('partidos')
+            return redirect(destino or 'partidos')
     else:
         form = RegistroForm()
-    return render(request, 'apuestas/registro.html', {'form': form})
+    return render(request, 'apuestas/registro.html', {'form': form, 'next': destino})
 
 
 def perfil(request, username):
@@ -226,4 +284,50 @@ def perfil(request, username):
         'minimo': MINIMO_PARTIDOS_EFECTIVOS,
         'grafico': grafico.preparar(stats.serie),
         'grupos': grupos,
+        'n_seguidores': usuario.seguidores.count(),
+        'n_siguiendo': usuario.seguimientos.count(),
+        'lo_sigo': request.user.is_authenticated and request.user.sigue_a(usuario),
     })
+
+
+@login_required
+@require_POST
+def seguir(request, username):
+    """Botón Seguir / Dejar de seguir (si ya lo sigues, lo deja de seguir)."""
+    usuario = get_object_or_404(Usuario, username=username)
+    if usuario != request.user:
+        seguimiento, creado = Seguimiento.objects.get_or_create(seguidor=request.user, seguido=usuario)
+        if not creado:
+            seguimiento.delete()
+    return redirect('perfil', username=usuario.username)
+
+
+@login_required
+def cuenta(request):
+    """Editar tu perfil: subir o quitar la foto."""
+    form = FotoForm()
+    if request.method == 'POST':
+        if 'quitar' in request.POST:
+            request.user.foto.delete(save=True)   # borra el archivo y deja el campo vacío
+            messages.success(request, 'Quitamos tu foto. Ahora se muestran tus iniciales.')
+            return redirect('cuenta')
+
+        form = FotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                nueva = procesar_foto(form.cleaned_data['foto'])
+            except Exception:
+                form.add_error('foto', 'No pudimos leer esa imagen. Prueba con otra.')
+            else:
+                anterior = request.user.foto.name
+                request.user.foto.save('foto.jpg', nueva, save=True)
+                if anterior:
+                    request.user.foto.storage.delete(anterior)   # no dejar fotos viejas ocupando espacio
+                messages.success(request, '¡Foto actualizada!')
+                return redirect('perfil', username=request.user.username)
+
+    return render(request, 'apuestas/cuenta.html', {'seccion': 'perfil', 'form': form})
+
+
+def como_funciona(request):
+    return render(request, 'apuestas/como_funciona.html', {'seccion': 'guia'})

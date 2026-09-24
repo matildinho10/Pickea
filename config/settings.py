@@ -131,6 +131,10 @@ STATIC_URL = 'static/'
 # Carpeta donde `collectstatic` junta CSS y JS para servirlos en internet
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Archivos que suben los usuarios (fotos de perfil)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
@@ -146,7 +150,7 @@ MAILERS = {
 AUTH_USER_MODEL = 'apuestas.Usuario'
 
 # Nombre provisorio de la página: cámbialo aquí y se actualiza en todas partes.
-NOMBRE_SITIO = 'Pickea'
+NOMBRE_SITIO = 'Pronostika'
 
 # Muestra la etiqueta amarilla "Datos de ejemplo" en la barra superior.
 # Ponlo en False cuando conectemos la API de cuotas reales.

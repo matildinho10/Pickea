@@ -6,18 +6,18 @@
       <tr>
         <th scope="col" class="col-pos">#</th>
         <th scope="col">Usuario</th>
-        <th scope="col" class="num col-opcional-chica">Partidos ef.</th>
+        <th scope="col" class="num col-opcional-chica">Partidos ef. <a class="ayuda-q" href="{% url 'como_funciona' %}#partidos-efectivos" aria-label="¿Qué son los partidos efectivos?">?</a></th>
         <th scope="col" class="num col-opcional">Apuestas</th>
-        <th scope="col" class="num">ROI</th>
+        <th scope="col" class="num">ROI <a class="ayuda-q" href="{% url 'como_funciona' %}#roi" aria-label="¿Qué es el ROI?">?</a></th>
         <th scope="col" class="num col-opcional">Ganancia</th>
-        <th scope="col" class="num">p-valor</th>
+        <th scope="col" class="num">p-value <a class="ayuda-q" href="{% url 'como_funciona' %}#p-value" aria-label="¿Qué es el p-value?">?</a></th>
       </tr>
     </thead>
     <tbody>
       {% for e in filas %}
       <tr>
-        <td class="col-pos">{% if numerar %}{{ forloop.counter }}{% else %}—{% endif %}</td>
-        <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">@{{ e.usuario.username }}</a></td>
+        <td class="col-pos">{% if numerar %}{{ e.puesto }}{% else %}—{% endif %}</td>
+        <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">{% include 'apuestas/_avatar.html' with u=e.usuario tamano='chico' %}<span>@{{ e.usuario.username }}</span></a></td>
         <td class="num mono col-opcional-chica">{{ e.partidos_efectivos|floatformat:0 }}</td>
         <td class="num mono tenue col-opcional">{{ e.apuestas }}</td>
         <td class="num mono fuerte {{ e.roi|tono }}">{{ e.roi|porcentaje }}</td>

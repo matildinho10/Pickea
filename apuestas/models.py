@@ -8,6 +8,7 @@ Jerarquía:
     Temporada ─┐
     Equipo ────┴─> Partido ──> Mercado ──> Opcion <── Apuesta ──> Usuario
 """
+import uuid
 from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
@@ -17,12 +18,39 @@ from django.db import models, transaction
 from django.utils import timezone
 
 
+def ruta_foto(usuario, nombre_original):
+    """Nombre al azar para cada foto: evita choques y no revela el nombre del archivo original."""
+    return f'fotos/{uuid.uuid4().hex}.jpg'
+
+
 class Usuario(AbstractUser):
     """Usuario de la página. Hereda nombre, contraseña, email, etc. de Django."""
+
+    foto = models.ImageField(upload_to=ruta_foto, blank=True)
 
     class Meta:
         verbose_name = 'usuario'
         verbose_name_plural = 'usuarios'
+
+    def sigue_a(self, otro):
+        return Seguimiento.objects.filter(seguidor=self, seguido=otro).exists()
+
+
+class Seguimiento(models.Model):
+    """'seguidor' sigue a 'seguido' (un tipster que le interesa)."""
+
+    seguidor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='seguimientos')
+    seguido = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='seguidores')
+    creado = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['seguidor', 'seguido'], name='seguir_una_sola_vez'),
+            models.CheckConstraint(condition=~models.Q(seguidor=models.F('seguido')), name='no_seguirse_a_si_mismo'),
+        ]
+
+    def __str__(self):
+        return f'{self.seguidor} sigue a {self.seguido}'
 
 
 class Temporada(models.Model):

@@ -1,0 +1,32 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Editar perfil{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Editar perfil</h1>
+
+  <div class="foto-actual">
+    {% include 'apuestas/_avatar.html' with u=user %}
+    <div>
+      <div class="fuerte">@{{ user.username }}</div>
+      <div class="tenue pequeno">{% if user.foto %}Esta es tu foto actual.{% else %}Todavía no tienes foto: se muestran tus iniciales.{% endif %}</div>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <button type="submit" class="boton-principal">Guardar foto</button>
+  </form>
+
+  {% if user.foto %}
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="quitar" value="1" class="boton-texto">Quitar mi foto</button>
+  </form>
+  {% endif %}
+
+  <p class="tenue pequeno">La foto se recorta en forma cuadrada. <a href="{% url 'perfil' user.username %}">Volver a mi perfil</a></p>
+</div>
+{% endblock %}

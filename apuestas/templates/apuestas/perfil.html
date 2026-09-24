@@ -6,13 +6,31 @@
 {% block contenido %}
 <div class="encabezado">
   <div class="perfil-cabecera">
-    <div class="avatar" aria-hidden="true">{{ perfil_usuario.username|iniciales }}</div>
+    {% include 'apuestas/_avatar.html' with u=perfil_usuario %}
     <div class="encabezado-texto">
       <h1 class="perfil-nombre">@{{ perfil_usuario.username }}</h1>
       <div class="tenue">
         Miembro desde {{ perfil_usuario.date_joined|date:'F \d\e Y' }}
         {% if puesto %} · {{ puesto }}.º en la temporada {{ temporada.anio }}{% endif %}
         · <a class="fuerte" href="{% url 'ranking' %}">Ver ranking</a>
+      </div>
+      <div class="perfil-social">
+        <span><strong>{{ n_seguidores }}</strong> seguidor{{ n_seguidores|pluralize:"es" }}</span>
+        <span><strong>{{ n_siguiendo }}</strong> siguiendo</span>
+        {% if es_mio %}
+          <a class="boton-secundario" href="{% url 'cuenta' %}">Editar perfil</a>
+        {% elif user.is_authenticated %}
+          <form method="post" action="{% url 'seguir' perfil_usuario.username %}">
+            {% csrf_token %}
+            {% if lo_sigo %}
+              <button type="submit" class="boton-secundario siguiendo" aria-label="Dejar de seguir a @{{ perfil_usuario.username }}">Siguiendo ✓</button>
+            {% else %}
+              <button type="submit" class="boton-seguir">Seguir</button>
+            {% endif %}
+          </form>
+        {% else %}
+          <a class="boton-seguir" href="{% url 'entrar' %}?next={{ request.path|urlencode }}">Seguir</a>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -27,41 +45,35 @@
 <div class="perfil-resumen">
   <section class="evidencia" aria-labelledby="titulo-evidencia">
     <h2 id="titulo-evidencia">Evidencia de habilidad</h2>
-    <div class="evidencia-numeros">
-      <div>
-        <div class="evidencia-etiqueta">z</div>
-        <div class="evidencia-valor">{{ stats.z|con_signo:2 }}</div>
-      </div>
-      <div>
-        <div class="evidencia-etiqueta">p-valor</div>
-        <div class="evidencia-valor {% if stats.p_valor is not None and stats.p_valor < 0.05 %}significativo{% endif %}">{{ stats.p_valor|pvalor }}</div>
-      </div>
+    <div>
+      <div class="evidencia-etiqueta">p-value <a class="ayuda-q ayuda-q-oscuro" href="{% url 'como_funciona' %}#p-value" aria-label="¿Qué es el p-value?">?</a></div>
+      <div class="evidencia-valor {% if stats.p_valor is not None and stats.p_valor < 0.05 %}significativo{% endif %}">{{ stats.p_valor|pvalor }}</div>
     </div>
-    {% if stats.z is None %}
+    {% if stats.p_valor is None %}
       <p>Todavía no hay apuestas decididas en este período.</p>
     {% else %}
       <p>Sin ventaja sobre las cuotas, habría {{ stats.p_valor|probabilidad }} de probabilidad de lograr un resultado igual o mejor por pura suerte.</p>
       {% if not stats.en_ranking %}
-        <p class="evidencia-aviso">Aún no entra al ranking: {{ stats.partidos_efectivos|decimal:1 }} de {{ minimo }} partidos efectivos. Con pocos partidos, el z es poco confiable.</p>
+        <p class="evidencia-aviso">Aún no entra al ranking: {{ stats.partidos_efectivos|decimal:1 }} de {{ minimo }} partidos efectivos. Con pocos partidos, el p-value es poco confiable.</p>
       {% endif %}
     {% endif %}
   </section>
 
   <div class="grilla-datos">
     <div class="dato">
-      <div class="dato-etiqueta">ROI</div>
+      <div class="dato-etiqueta">ROI <a class="ayuda-q" href="{% url 'como_funciona' %}#roi" aria-label="¿Qué es el ROI?">?</a></div>
       <div class="dato-valor {{ stats.roi|tono }}">{{ stats.roi|porcentaje }}</div>
       <div class="dato-ayuda">Ganancia por unidad apostada</div>
     </div>
     <div class="dato">
-      <div class="dato-etiqueta">Ganancia</div>
+      <div class="dato-etiqueta">Ganancia <a class="ayuda-q" href="{% url 'como_funciona' %}#unidades" aria-label="¿Qué son las unidades?">?</a></div>
       <div class="dato-valor {{ stats.ganancia|tono }}">{{ stats.ganancia|con_signo }} u</div>
       <div class="dato-ayuda">Sobre {{ stats.unidades|decimal:0 }} unidades apostadas</div>
     </div>
     <div class="dato">
-      <div class="dato-etiqueta">Partidos efectivos</div>
+      <div class="dato-etiqueta">Partidos efectivos <a class="ayuda-q" href="{% url 'como_funciona' %}#partidos-efectivos" aria-label="¿Qué son los partidos efectivos?">?</a></div>
       <div class="dato-valor">{{ stats.partidos_efectivos|decimal:0 }}</div>
-      <div class="dato-ayuda">Base del cálculo del z · mínimo {{ minimo }} para el ranking</div>
+      <div class="dato-ayuda">Base del cálculo del p-value · mínimo {{ minimo }} para el ranking</div>
     </div>
     <div class="dato">
       <div class="dato-etiqueta">Apuestas</div>
@@ -69,12 +81,12 @@
       <div class="dato-ayuda">{% if stats.apuestas %}Promedio de {{ stats.unidades_por_apuesta|decimal:1 }} unidades por apuesta{% else %}Sin apuestas decididas{% endif %}</div>
     </div>
     <div class="dato">
-      <div class="dato-etiqueta">Cuota promedio</div>
+      <div class="dato-etiqueta">Cuota promedio <a class="ayuda-q" href="{% url 'como_funciona' %}#cuotas" aria-label="¿Qué es una cuota?">?</a></div>
       <div class="dato-valor">{{ stats.cuota_promedio|decimal }}</div>
       <div class="dato-ayuda">Promedio de las cuotas fijadas al apostar</div>
     </div>
     <div class="dato">
-      <div class="dato-etiqueta">CLV · valor vs. cierre</div>
+      <div class="dato-etiqueta">CLV · valor vs. cierre <a class="ayuda-q" href="{% url 'como_funciona' %}#clv" aria-label="¿Qué es el CLV?">?</a></div>
       <div class="dato-valor {{ stats.clv|tono }}">{{ stats.clv|porcentaje }}</div>
       <div class="dato-ayuda">
         {% if stats.clv is None %}Sin cuotas de cierre todavía
