@@ -2,6 +2,8 @@
 Vistas: cada función recibe una visita (request) y devuelve una página.
 Buscan los datos y se los pasan a una plantilla HTML (carpeta templates/).
 """
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
@@ -24,6 +26,7 @@ from .models import (MERCADOS, Apuesta, Mercado, Opcion, Partido, Seguimiento, T
                      fijar_cierres_pendientes)
 
 ORDEN_MERCADOS = list(MERCADOS)
+log = logging.getLogger(__name__)
 
 
 def ranking(request):
@@ -249,6 +252,7 @@ def registro(request):
             try:
                 enviar_activacion(request, usuario)
             except Exception:
+                log.exception('No se pudo enviar un correo')   # queda en el registro de errores
                 usuario.delete()               # así puede volver a intentarlo con el mismo nombre
                 form.add_error(None, 'No pudimos enviar el correo de activación. Intenta de nuevo en unos minutos.')
             else:
@@ -289,6 +293,7 @@ def reenviar_activacion(request):
             try:
                 enviar_activacion(request, usuario)
             except Exception:
+                log.exception('No se pudo enviar un correo')   # queda en el registro de errores
                 form.add_error(None, 'No pudimos enviar el correo. Intenta de nuevo en unos minutos.')
                 return render(request, 'apuestas/reenviar.html', {'form': form})
         # Mismo mensaje exista o no la cuenta: así nadie puede averiguar qué correos están registrados
@@ -390,6 +395,7 @@ def cuenta(request):
             try:
                 enviar_confirmacion(request, request.user)
             except Exception:
+                log.exception('No se pudo enviar un correo')   # queda en el registro de errores
                 messages.error(request, 'Guardamos tu correo, pero no pudimos enviar la confirmación. '
                                         'Intenta de nuevo en unos minutos.')
             else:
