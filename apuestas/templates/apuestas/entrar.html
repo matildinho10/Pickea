@@ -1,0 +1,16 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Entrar{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Entrar</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="boton-principal">Entrar</button>
+  </form>
+  <p class="tenue">¿No tienes cuenta? <a href="{% url 'registro' %}">Créala aquí</a>.</p>
+</div>
+{% endblock %}

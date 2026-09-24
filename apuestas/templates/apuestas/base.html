@@ -1,0 +1,50 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{% endblock %} · {{ NOMBRE_SITIO }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'apuestas/estilos.css' %}">
+</head>
+<body>
+  <header class="barra">
+    <div class="barra-izq">
+      <a class="marca" href="{% url 'ranking' %}">{{ NOMBRE_SITIO }}</a>
+      <nav aria-label="Principal" class="nav">
+        <a href="{% url 'ranking' %}" {% if seccion == 'ranking' %}aria-current="page"{% endif %}>Ranking</a>
+        <a href="{% url 'partidos' %}" {% if seccion == 'partidos' %}aria-current="page"{% endif %}>Partidos</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'mis_apuestas' %}" {% if seccion == 'mis_apuestas' %}aria-current="page"{% endif %}>Mis apuestas</a>
+          <a href="{% url 'perfil' user.username %}" {% if seccion == 'perfil' %}aria-current="page"{% endif %}>Mi perfil</a>
+        {% endif %}
+      </nav>
+    </div>
+    <div class="barra-der">
+      {% if DATOS_DE_EJEMPLO %}<span class="etiqueta-ejemplo">Datos de ejemplo</span>{% endif %}
+      {% if user.is_authenticated %}
+        <a class="usuario-actual" href="{% url 'perfil' user.username %}">@{{ user.username }}</a>
+        <form method="post" action="{% url 'salir' %}">
+          {% csrf_token %}
+          <button type="submit" class="boton-barra">Salir</button>
+        </form>
+      {% else %}
+        <a class="usuario-actual" href="{% url 'entrar' %}">Entrar</a>
+        <a class="boton-barra" href="{% url 'registro' %}">Crear cuenta</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="contenido">
+    {% if messages %}
+      <div class="mensajes" role="status">
+        {% for m in messages %}<div class="mensaje mensaje-{{ m.tags }}">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    {% block contenido %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

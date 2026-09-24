@@ -1,0 +1,16 @@
+{% extends 'apuestas/base.html' %}
+
+{% block titulo %}Crear cuenta{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta formulario">
+  <h1>Crear cuenta</h1>
+  <p class="tenue">Sin saldo ni pagos: solo eliges tus apuestas y el ranking mide qué tan bien eliges.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include 'apuestas/_formulario.html' %}
+    <button type="submit" class="boton-principal">Crear cuenta</button>
+  </form>
+  <p class="tenue">¿Ya tienes cuenta? <a href="{% url 'entrar' %}">Entra aquí</a>.</p>
+</div>
+{% endblock %}

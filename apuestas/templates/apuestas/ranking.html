@@ -1,0 +1,40 @@
+{% extends 'apuestas/base.html' %}
+{% load formato %}
+
+{% block titulo %}Ranking{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <div class="encabezado-texto">
+    <h1>Ranking</h1>
+    <p>Ordenado por z: qué tan difícil es explicar el resultado de cada usuario solo con suerte.
+       Un ROI alto con pocas apuestas no basta para subir.</p>
+  </div>
+  {% if temporada %}
+  <nav class="pestanas" aria-label="Período">
+    <a href="?periodo=temporada" {% if periodo == 'temporada' %}aria-current="page"{% endif %}>Temporada {{ temporada.anio }}</a>
+    <a href="?periodo=historico" {% if periodo == 'historico' %}aria-current="page"{% endif %}>Histórico</a>
+  </nav>
+  {% endif %}
+</div>
+
+{% include 'apuestas/_tabla_ranking.html' with filas=en_ranking numerar=True vacio="Todavía nadie llega al mínimo de partidos efectivos." %}
+
+<div class="nota-pie">
+  <p>Para entrar al ranking se necesitan al menos {{ minimo }} partidos efectivos.
+     El p-valor es la probabilidad de lograr un resultado igual o mejor por pura suerte,
+     apostando sin ventaja sobre las cuotas. Barra verde: p-valor menor a 0.05.</p>
+  {% if bajo_minimo %}
+    {% if ver_bajo_minimo %}
+      <a href="?periodo={{ periodo }}">Ocultar usuarios bajo el mínimo</a>
+    {% else %}
+      <a href="?periodo={{ periodo }}&bajo=1#bajo-minimo">Ver usuarios bajo el mínimo ({{ bajo_minimo|length }})</a>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% if ver_bajo_minimo and bajo_minimo %}
+  <h2 id="bajo-minimo" class="subtitulo">Bajo el mínimo</h2>
+  {% include 'apuestas/_tabla_ranking.html' with filas=bajo_minimo numerar=False %}
+{% endif %}
+{% endblock %}

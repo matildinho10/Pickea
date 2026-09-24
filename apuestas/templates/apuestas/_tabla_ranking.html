@@ -1,0 +1,41 @@
+{% load formato %}
+{# Tabla reutilizable: se usa para el ranking y para los usuarios bajo el mínimo. #}
+<div class="tarjeta tabla-contenedor">
+  <table class="tabla-ranking">
+    <thead>
+      <tr>
+        <th scope="col" class="col-pos">#</th>
+        <th scope="col">Usuario</th>
+        <th scope="col" class="num col-opcional-chica">Partidos ef.</th>
+        <th scope="col" class="num col-opcional">Apuestas</th>
+        <th scope="col" class="num">ROI</th>
+        <th scope="col" class="num col-opcional">Ganancia</th>
+        <th scope="col" class="num">z</th>
+        <th scope="col" class="num">p-valor</th>
+        <th scope="col" class="col-opcional col-barra">Evidencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in filas %}
+      <tr>
+        <td class="col-pos">{% if numerar %}{{ forloop.counter }}{% else %}—{% endif %}</td>
+        <td><a class="enlace-usuario" href="{% url 'perfil' e.usuario.username %}">@{{ e.usuario.username }}</a></td>
+        <td class="num mono col-opcional-chica">{{ e.partidos_efectivos|floatformat:0 }}</td>
+        <td class="num mono tenue col-opcional">{{ e.apuestas }}</td>
+        <td class="num mono fuerte {{ e.roi|tono }}">{{ e.roi|porcentaje }}</td>
+        <td class="num mono col-opcional {{ e.ganancia|tono }}">{{ e.ganancia|con_signo }} u</td>
+        <td class="num mono fuerte">{{ e.z|con_signo:2 }}</td>
+        <td class="num mono">{{ e.p_valor|pvalor }}</td>
+        <td class="col-opcional col-barra">
+          <div class="barra-evidencia" aria-hidden="true">
+            <div class="{% if e.p_valor is not None and e.p_valor < 0.05 %}significativa{% endif %}"
+                 style="width: {{ e.z|ancho_barra }}%"></div>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="9" class="vacio">{{ vacio|default:"Sin datos." }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

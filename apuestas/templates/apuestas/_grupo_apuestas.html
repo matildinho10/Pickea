@@ -1,0 +1,35 @@
+{% load formato l10n %}
+{# Apuestas de un usuario en UN partido. Se usa en "Mis apuestas" y en el perfil. #}
+{% localize off %}
+<div class="grupo">
+  <div class="grupo-cabecera">
+    <div>
+      <span class="tenue">{{ g.partido.inicio|date:'d M · H:i' }}</span> ·
+      <span class="fuerte">{{ g.partido }}</span>
+      {% if g.partido.goles_local is not None %}<span class="mono tenue">({{ g.partido.goles_local }}-{{ g.partido.goles_visita }})</span>{% endif %}
+    </div>
+    {% if g.ganancia is not None %}
+      <div class="mono fuerte {{ g.ganancia|tono }}">{{ g.ganancia|con_signo:2 }} u</div>
+    {% else %}
+      <div class="tenue pequeno">{% if g.partido.acepta_apuestas %}Por jugar{% else %}En juego{% endif %}</div>
+    {% endif %}
+  </div>
+  {% for a in g.apuestas %}
+  <div class="fila-apuesta">
+    <div class="fila-apuesta-opcion">
+      <div>{{ a.opcion.etiqueta }}</div>
+      <div class="tenue pequeno">{{ a.opcion.mercado.get_tipo_display }}</div>
+    </div>
+    <div class="mono derecha" title="Cuota fijada">{{ a.cuota }}</div>
+    <div class="mono tenue derecha">{{ a.unidades }} u</div>
+    {% if a.ganancia is None %}
+      <div class="derecha pequeno tenue">Si gana</div>
+      <div class="mono fuerte derecha positivo">{{ a.ganancia_posible|con_signo:2 }} u</div>
+    {% else %}
+      <div class="derecha pequeno fuerte {{ a.ganancia|tono }}">{{ a.opcion.get_resultado_display|cut:" (se devuelve)" }}</div>
+      <div class="mono fuerte derecha {{ a.ganancia|tono }}">{{ a.ganancia|con_signo:2 }} u</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endlocalize %}

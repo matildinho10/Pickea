@@ -1,0 +1,9 @@
+{# Botón de una cuota. El navegador solo usa data-cuota para MOSTRARLA; al confirmar, el servidor usa la vigente. #}
+<button type="button" class="cuota{% if o.resultado == 'ganada' %} ganadora{% endif %}"
+        data-opcion="{{ o.pk }}" data-etiqueta="{{ o.etiqueta }}" data-partido="{{ p }}"
+        data-cuando="{{ p.inicio|date:'d/m · H:i' }}" data-cuota="{{ o.cuota }}"
+        aria-pressed="false" aria-label="{{ o.etiqueta }}, cuota {{ o.cuota }}"
+        {% if not p.abierto %}disabled{% endif %}>
+  <span class="cuota-corto">{{ o.corto }}</span>
+  <span class="cuota-valor">{{ o.cuota }}</span>
+</button>

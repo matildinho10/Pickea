@@ -1,0 +1,13 @@
+# Entorno virtual (se reinstala con requirements.txt)
+.venv/
+
+# Base de datos local: tiene tus datos y usuarios, no se sube
+db.sqlite3
+
+# Archivos generados automáticamente
+__pycache__/
+*.pyc
+staticfiles/
+
+# Claves secretas (nunca a GitHub)
+.env

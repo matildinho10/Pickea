@@ -1,0 +1,157 @@
+{% extends 'apuestas/base.html' %}
+{% load static l10n %}
+
+{% block titulo %}Partidos{% endblock %}
+
+{% block contenido %}
+{% localize off %}{# cuotas con punto decimal (1.72), no con coma #}
+<div class="layout-partidos">
+  <section class="lista-partidos" aria-labelledby="titulo-fecha">
+    <div class="encabezado">
+      <div class="encabezado-texto">
+        {% if temporada %}<div class="antetitulo">{{ temporada.nombre }}</div>{% endif %}
+        <h1 id="titulo-fecha">{% if fecha %}Fecha {{ fecha }}{% else %}Partidos{% endif %}</h1>
+      </div>
+      <nav class="navegar-fechas" aria-label="Cambiar de fecha">
+        {% if anterior %}<a href="?fecha={{ anterior }}">← Fecha {{ anterior }}</a>{% endif %}
+        {% if siguiente %}<a href="?fecha={{ siguiente }}">Fecha {{ siguiente }} →</a>{% endif %}
+      </nav>
+    </div>
+    <p class="nota-lista">Toca un partido para ver todos sus mercados.{% if DATOS_DE_EJEMPLO %} Cuotas de ejemplo.{% endif %}</p>
+
+    <div class="tarjeta">
+      <div class="partido-fila partido-titulos" aria-hidden="true">
+        <div>Hora</div>
+        <div>Partido</div>
+        <div class="centro">Resultado (1 X 2)</div>
+        <div class="centro">Goles 2.5</div>
+      </div>
+
+      {% for p in lista %}
+      <article class="partido">
+        <div class="partido-fila">
+          <div class="partido-hora">
+            <span class="fuerte">{{ p.inicio|date:'D d M'|capfirst }}</span>
+            {% if p.goles_local is not None %}
+              <span class="marcador">Final {{ p.goles_local }}-{{ p.goles_visita }}</span>
+            {% elif not p.abierto %}
+              <span class="cerrado">Cerrado</span>
+            {% else %}
+              <span class="mono tenue">{{ p.inicio|date:'H:i' }}</span>
+            {% endif %}
+          </div>
+
+          <button type="button" class="partido-equipos" aria-expanded="false" aria-controls="mercados-{{ p.pk }}">
+            <span>{{ p.local }}</span>
+            <span>{{ p.visita }}</span>
+            <span class="ver-mas">
+              <span data-texto-cerrado="+{{ p.extras|length }} mercados" data-texto-abierto="Ocultar mercados">+{{ p.extras|length }} mercados</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+
+          <div class="grupo-cuotas grupo-1x2">
+            {% for o in p.m_1x2.opciones.all %}{% include 'apuestas/_cuota.html' %}{% endfor %}
+          </div>
+          <div class="grupo-cuotas grupo-goles">
+            {% for o in p.m_goles.opciones.all %}{% include 'apuestas/_cuota.html' %}{% endfor %}
+          </div>
+        </div>
+
+        <div class="panel-mercados" id="mercados-{{ p.pk }}" hidden>
+          <div class="panel-titulo">Todos los mercados · {{ p.local }} vs {{ p.visita }}</div>
+          <div class="grilla-mercados">
+            {% for m in p.extras %}
+            <div class="mercado">
+              <div class="mercado-nombre">{{ m.get_tipo_display }}</div>
+              <div class="grupo-cuotas" style="grid-template-columns: repeat({{ m.opciones.all|length }}, minmax(0, 1fr));">
+                {% for o in m.opciones.all %}{% include 'apuestas/_cuota.html' %}{% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <p class="vacio relleno">No hay partidos cargados.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <aside class="columna-boleta">
+    <form method="post" action="{% url 'apostar' %}" id="boleta" class="tarjeta boleta" aria-labelledby="titulo-boleta">
+      {% csrf_token %}
+      <h2 id="titulo-boleta">Tu apuesta</h2>
+
+      <p class="boleta-vacia" data-vacia>Toca una cuota para agregarla a tu boleta.</p>
+      <div class="boleta-seleccion" data-seleccion hidden>
+        <div class="tenue pequeno" data-cuando></div>
+        <div class="boleta-partido" data-partido></div>
+        <div class="boleta-linea">
+          <div class="boleta-etiqueta" data-etiqueta></div>
+          <div class="boleta-cuota" data-cuota></div>
+        </div>
+      </div>
+      <input type="hidden" name="opcion">
+      <input type="hidden" name="cuota_vista">
+
+      <div class="boleta-unidades">
+        <label for="unidades" class="fuerte">Unidades (1 a 10)</label>
+        <div class="contador">
+          <button type="button" data-restar aria-label="Restar una unidad">−</button>
+          <output for="unidades" data-unidades>1</output>
+          <button type="button" data-sumar aria-label="Sumar una unidad">+</button>
+        </div>
+        <input id="unidades" name="unidades" type="range" min="1" max="10" step="1" value="1">
+      </div>
+
+      <div class="boleta-resumen">
+        <div><span class="tenue">Si gana</span><span class="mono fuerte positivo" data-si-gana>—</span></div>
+        <div><span class="tenue">Si pierde</span><span class="mono fuerte negativo" data-si-pierde>−1 u</span></div>
+      </div>
+
+      {% if user.is_authenticated %}
+        <button type="submit" class="boton-principal" data-confirmar disabled>Confirmar apuesta</button>
+      {% else %}
+        <a class="boton-principal" href="{% url 'entrar' %}?next={{ request.get_full_path|urlencode }}">Inicia sesión para apostar</a>
+      {% endif %}
+      <p class="nota">La cuota queda fija al confirmar. Las apuestas se cierran al inicio del partido.</p>
+    </form>
+
+    {% if mis_apuestas %}
+    <section class="tarjeta mis-apuestas" aria-labelledby="titulo-mis-apuestas">
+      <h2 id="titulo-mis-apuestas">Tus apuestas en esta fecha</h2>
+      <a class="pequeno fuerte" href="{% url 'mis_apuestas' %}">Ver todas mis apuestas</a>
+      <ul>
+        {% for a in mis_apuestas %}
+        <li>
+          <div>
+            <div class="fuerte">{{ a.opcion.etiqueta }}</div>
+            <div class="tenue pequeno">{{ a.partido }}</div>
+          </div>
+          <div class="mono derecha">{{ a.unidades }} u · {{ a.cuota }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section class="como-funciona" aria-labelledby="titulo-como">
+      <h2 id="titulo-como">Cómo funciona</h2>
+      <p>Eliges de 1 a 10 unidades según tu confianza. No hay saldo: el ranking mide qué tan bien eliges, no cuánto arriesgas.</p>
+      <p>Varias apuestas en un mismo partido cuentan como una sola observación para el cálculo del ranking.</p>
+    </section>
+  </aside>
+</div>
+
+<a href="#boleta" class="aviso-boleta" data-aviso hidden>
+  <span data-aviso-texto></span>
+  <span class="fuerte">Ir a la boleta ↓</span>
+</a>
+{% endlocalize %}
+{{ seleccion|json_script:'seleccion-inicial' }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'apuestas/partidos.js' %}"></script>
+{% endblock %}

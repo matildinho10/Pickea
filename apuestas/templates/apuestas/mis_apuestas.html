@@ -1,0 +1,48 @@
+{% extends 'apuestas/base.html' %}
+{% load formato %}
+
+{% block titulo %}Mis apuestas{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <div class="encabezado-texto">
+    <h1>Mis apuestas</h1>
+    <p>Tus apuestas activas y todo tu historial, agrupados por partido.</p>
+  </div>
+  <nav class="pestanas" aria-label="Tipo de apuestas">
+    <a href="?vista=activas" {% if vista == 'activas' %}aria-current="page"{% endif %}>Activas ({{ n_activas }})</a>
+    <a href="?vista=historial" {% if vista == 'historial' %}aria-current="page"{% endif %}>Historial</a>
+  </nav>
+</div>
+
+<div class="resumen">
+  {% if vista == 'activas' %}
+    <div class="resumen-dato"><span class="tenue">Apuestas activas</span><span class="mono">{{ n_activas }}</span></div>
+    <div class="resumen-dato"><span class="tenue">Unidades en juego</span><span class="mono">{{ unidades_en_juego }} u</span></div>
+  {% else %}
+    <div class="resumen-dato"><span class="tenue">Apuestas decididas</span><span class="mono">{{ stats.apuestas }}</span></div>
+    <div class="resumen-dato"><span class="tenue">Ganancia</span><span class="mono {{ stats.ganancia|tono }}">{{ stats.ganancia|con_signo }} u</span></div>
+    <div class="resumen-dato"><span class="tenue">ROI</span><span class="mono {{ stats.roi|tono }}">{{ stats.roi|porcentaje }}</span></div>
+    <a class="fuerte" href="{% url 'perfil' user.username %}">Ver mis estadísticas completas</a>
+  {% endif %}
+</div>
+
+<div class="tarjeta lista-grupos">
+  {% for g in grupos %}
+    {% include 'apuestas/_grupo_apuestas.html' %}
+  {% empty %}
+    <p class="vacio relleno">
+      {% if vista == 'activas' %}No tienes apuestas activas. <a href="{% url 'partidos' %}">Ver partidos</a>
+      {% else %}Todavía no tienes apuestas decididas.{% endif %}
+    </p>
+  {% endfor %}
+</div>
+
+{% if pagina and pagina.paginator.num_pages > 1 %}
+<nav class="paginacion" aria-label="Páginas del historial">
+  {% if pagina.has_previous %}<a href="?vista=historial&pagina={{ pagina.previous_page_number }}">← Más recientes</a>{% else %}<span></span>{% endif %}
+  <span class="tenue">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+  {% if pagina.has_next %}<a href="?vista=historial&pagina={{ pagina.next_page_number }}">Más antiguas →</a>{% else %}<span></span>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

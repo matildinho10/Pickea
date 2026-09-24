@@ -1,0 +1,160 @@
+{% extends 'apuestas/base.html' %}
+{% load static formato %}
+
+{% block titulo %}@{{ perfil_usuario.username }}{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <div class="perfil-cabecera">
+    <div class="avatar" aria-hidden="true">{{ perfil_usuario.username|iniciales }}</div>
+    <div class="encabezado-texto">
+      <h1 class="perfil-nombre">@{{ perfil_usuario.username }}</h1>
+      <div class="tenue">
+        Miembro desde {{ perfil_usuario.date_joined|date:'F \d\e Y' }}
+        {% if puesto %} · {{ puesto }}.º en la temporada {{ temporada.anio }}{% endif %}
+        · <a class="fuerte" href="{% url 'ranking' %}">Ver ranking</a>
+      </div>
+    </div>
+  </div>
+  {% if temporada %}
+  <nav class="pestanas" aria-label="Período">
+    <a href="?periodo=temporada" {% if periodo == 'temporada' %}aria-current="page"{% endif %}>Temporada {{ temporada.anio }}</a>
+    <a href="?periodo=historico" {% if periodo == 'historico' %}aria-current="page"{% endif %}>Histórico</a>
+  </nav>
+  {% endif %}
+</div>
+
+<div class="perfil-resumen">
+  <section class="evidencia" aria-labelledby="titulo-evidencia">
+    <h2 id="titulo-evidencia">Evidencia de habilidad</h2>
+    <div class="evidencia-numeros">
+      <div>
+        <div class="evidencia-etiqueta">z</div>
+        <div class="evidencia-valor">{{ stats.z|con_signo:2 }}</div>
+      </div>
+      <div>
+        <div class="evidencia-etiqueta">p-valor</div>
+        <div class="evidencia-valor {% if stats.p_valor is not None and stats.p_valor < 0.05 %}significativo{% endif %}">{{ stats.p_valor|pvalor }}</div>
+      </div>
+    </div>
+    {% if stats.z is None %}
+      <p>Todavía no hay apuestas decididas en este período.</p>
+    {% else %}
+      <p>Sin ventaja sobre las cuotas, habría {{ stats.p_valor|probabilidad }} de probabilidad de lograr un resultado igual o mejor por pura suerte.</p>
+      {% if not stats.en_ranking %}
+        <p class="evidencia-aviso">Aún no entra al ranking: {{ stats.partidos_efectivos|decimal:1 }} de {{ minimo }} partidos efectivos. Con pocos partidos, el z es poco confiable.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+
+  <div class="grilla-datos">
+    <div class="dato">
+      <div class="dato-etiqueta">ROI</div>
+      <div class="dato-valor {{ stats.roi|tono }}">{{ stats.roi|porcentaje }}</div>
+      <div class="dato-ayuda">Ganancia por unidad apostada</div>
+    </div>
+    <div class="dato">
+      <div class="dato-etiqueta">Ganancia</div>
+      <div class="dato-valor {{ stats.ganancia|tono }}">{{ stats.ganancia|con_signo }} u</div>
+      <div class="dato-ayuda">Sobre {{ stats.unidades|decimal:0 }} unidades apostadas</div>
+    </div>
+    <div class="dato">
+      <div class="dato-etiqueta">Partidos efectivos</div>
+      <div class="dato-valor">{{ stats.partidos_efectivos|decimal:0 }}</div>
+      <div class="dato-ayuda">Base del cálculo del z · mínimo {{ minimo }} para el ranking</div>
+    </div>
+    <div class="dato">
+      <div class="dato-etiqueta">Apuestas</div>
+      <div class="dato-valor">{{ stats.apuestas }}</div>
+      <div class="dato-ayuda">{% if stats.apuestas %}Promedio de {{ stats.unidades_por_apuesta|decimal:1 }} unidades por apuesta{% else %}Sin apuestas decididas{% endif %}</div>
+    </div>
+    <div class="dato">
+      <div class="dato-etiqueta">Cuota promedio</div>
+      <div class="dato-valor">{{ stats.cuota_promedio|decimal }}</div>
+      <div class="dato-ayuda">Promedio de las cuotas fijadas al apostar</div>
+    </div>
+    <div class="dato">
+      <div class="dato-etiqueta">CLV · valor vs. cierre</div>
+      <div class="dato-valor {{ stats.clv|tono }}">{{ stats.clv|porcentaje }}</div>
+      <div class="dato-ayuda">
+        {% if stats.clv is None %}Sin cuotas de cierre todavía
+        {% elif stats.clv >= 0 %}Sus cuotas fueron {{ stats.clv|porcentaje|cut:'+' }} mejores que las de cierre, en promedio
+        {% else %}Sus cuotas fueron {{ stats.clv|porcentaje|cut:'−' }} peores que las de cierre, en promedio{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="tarjeta seccion-perfil" aria-labelledby="titulo-grafico">
+  <div class="seccion-cabecera">
+    <h2 id="titulo-grafico">Unidades acumuladas</h2>
+    <div class="tenue pequeno">
+      {% if periodo == 'temporada' %}Temporada {{ temporada.anio }}{% else %}Histórico{% endif %} · por partido
+      {% if grafico %} · total <span class="mono fuerte grafico-total">{{ grafico.final|con_signo }} u</span>{% endif %}
+    </div>
+  </div>
+  {% if grafico %}
+  <div class="grafico" data-grafico>
+    <div class="grafico-eje" aria-hidden="true">
+      {% for m in grafico.marcas %}<span style="top: {{ m.y|decimal:3 }}%">{{ m.valor|con_signo:0 }}</span>{% endfor %}
+    </div>
+    <div class="grafico-area" tabindex="0" role="img"
+         aria-label="Unidades acumuladas: de 0 a {{ grafico.final|con_signo }} en {{ grafico.n_partidos }} partidos. Usa las flechas para recorrer los partidos.">
+      <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+        {% for m in grafico.marcas %}
+          <line x1="0" x2="1000" y1="{{ m.y_svg|decimal }}" y2="{{ m.y_svg|decimal }}" class="grafico-rejilla" vector-effect="non-scaling-stroke"></line>
+        {% endfor %}
+        <line x1="0" x2="1000" y1="{{ grafico.cero_y|decimal }}" y2="{{ grafico.cero_y|decimal }}" class="grafico-cero" vector-effect="non-scaling-stroke"></line>
+        <polyline points="{{ grafico.puntos }}" class="grafico-linea {% if grafico.final < 0 %}negativa{% endif %}" vector-effect="non-scaling-stroke"></polyline>
+      </svg>
+      <div class="grafico-punto-final {% if grafico.final < 0 %}negativa{% endif %}" style="left: {{ grafico.final_x|decimal:3 }}%; top: {{ grafico.final_y|decimal:3 }}%"></div>
+      <div class="grafico-cruz" data-cruz hidden></div>
+      <div class="grafico-punto" data-punto hidden></div>
+      <div class="grafico-tooltip" data-tooltip hidden>
+        <div class="tooltip-valor"><span data-t-acum></span></div>
+        <div data-t-partido></div>
+        <div class="tenue" data-t-detalle></div>
+      </div>
+    </div>
+    <div class="grafico-pie tenue pequeno" aria-hidden="true">
+      <span>Inicio</span><span>Partido {{ grafico.n_partidos }}</span>
+    </div>
+  </div>
+  <details class="tabla-datos">
+    <summary>Ver los datos como tabla</summary>
+    <div class="tabla-contenedor">
+      <table>
+        <thead><tr><th scope="col">Fecha</th><th scope="col">Partido</th><th scope="col" class="num">Resultado</th><th scope="col" class="num">Acumulado</th></tr></thead>
+        <tbody>
+          {% for d in grafico.datos|slice:"1:" %}
+          <tr><td>{{ d.fecha }}</td><td>{{ d.partido }}</td><td class="num mono {{ d.g|tono }}">{{ d.g|con_signo:2 }}</td><td class="num mono">{{ d.a|con_signo:2 }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+  {{ grafico.datos|json_script:'datos-grafico' }}
+  {% else %}
+    <p class="vacio relleno">Aún no hay partidos decididos para graficar.</p>
+  {% endif %}
+</section>
+
+<section class="tarjeta lista-grupos" aria-labelledby="titulo-ultimas">
+  <div class="seccion-cabecera">
+    <h2 id="titulo-ultimas">Últimas apuestas</h2>
+    <div class="tenue pequeno">
+      Agrupadas por partido · solo apuestas ya decididas
+      {% if es_mio %} · <a class="fuerte" href="{% url 'mis_apuestas' %}?vista=historial">Ver todas</a>{% endif %}
+    </div>
+  </div>
+  {% for g in grupos %}
+    {% include 'apuestas/_grupo_apuestas.html' %}
+  {% empty %}
+    <p class="vacio relleno">Todavía no hay apuestas decididas.</p>
+  {% endfor %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if grafico %}<script src="{% static 'apuestas/grafico.js' %}"></script>{% endif %}
+{% endblock %}

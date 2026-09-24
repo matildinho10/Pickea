@@ -1,0 +1,702 @@
+/* ============================================================
+   Estilos de la página. Los colores están definidos una sola vez
+   aquí arriba: si cambias uno, cambia en todo el sitio.
+   ============================================================ */
+:root {
+  --fondo: #F2EFE7;
+  --texto: #17191C;
+  --acento: #A3231B;
+  --acento-hover: #7E1A14;
+  --positivo: #25603A;
+  --negativo: #A3231B;
+
+  --blanco: #FFFFFF;
+  --fondo-suave: #F8F6F0;     /* encabezados de tablas */
+  --fondo-pestanas: #E9E4D8;
+  --borde: #DAD5C8;
+  --linea: #E6E1D5;
+  --gris: #5A5E66;            /* texto secundario */
+  --gris-oscuro: #3B3E44;
+  --barra-vacia: #EFEBE1;
+  --barra-neutra: #9A9384;
+  --nav-inactivo: #C9C4B8;
+  --nav-activo: #E0574B;
+  --amarillo: #E8C66A;
+
+  --titulos: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --cuerpo: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--cuerpo);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+a { color: var(--acento); }
+a:hover { color: var(--acento-hover); }
+
+/* ---------- Barra superior ---------- */
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+  padding: 0 40px;
+  background: var(--texto);
+}
+.barra-izq { display: flex; align-items: center; gap: 40px; align-self: stretch; }
+.marca {
+  font-family: var(--titulos);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fondo);
+  text-decoration: none;
+}
+.marca:hover { color: var(--blanco); }
+.nav { display: flex; gap: 4px; align-self: stretch; }
+.nav a {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  color: var(--nav-inactivo);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav a:hover { color: var(--blanco); }
+.nav a[aria-current="page"] {
+  color: var(--blanco);
+  font-weight: 600;
+  box-shadow: inset 0 -3px 0 var(--nav-activo);
+}
+.barra-der { display: flex; align-items: center; gap: 16px; }
+.etiqueta-ejemplo {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto);
+  background: var(--amarillo);
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.usuario-actual { color: var(--fondo); text-decoration: none; font-weight: 500; }
+.usuario-actual:hover { color: var(--blanco); }
+
+/* ---------- Contenido ---------- */
+.contenido {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 40px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--titulos);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+}
+.subtitulo {
+  margin: 12px 0 0;
+  font-family: var(--titulos);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.encabezado {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.encabezado-texto { display: flex; flex-direction: column; gap: 8px; }
+.encabezado-texto p { margin: 0; max-width: 640px; color: var(--gris-oscuro); }
+
+/* Pestañas (Temporada / Histórico) */
+.pestanas {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--fondo-pestanas);
+  border-radius: 10px;
+}
+.pestanas a {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--texto);
+  text-decoration: none;
+}
+.pestanas a[aria-current="page"] { background: var(--texto); color: var(--blanco); }
+
+.tarjeta {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+/* ---------- Tabla del ranking ---------- */
+.tabla-contenedor { overflow-x: auto; }
+.tabla-ranking { width: 100%; border-collapse: collapse; }
+.tabla-ranking th {
+  padding: 12px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gris);
+  background: var(--fondo-suave);
+  text-align: left;
+  white-space: nowrap;
+}
+.tabla-ranking td {
+  height: 60px;
+  padding: 0 8px;
+  border-top: 1px solid var(--linea);
+  white-space: nowrap;
+}
+.tabla-ranking th:first-child, .tabla-ranking td:first-child { padding-left: 24px; }
+.tabla-ranking th:last-child, .tabla-ranking td:last-child { padding-right: 24px; }
+
+.col-pos { width: 48px; font-family: var(--titulos); font-size: 24px; font-weight: 700; }
+th.col-pos { font-family: var(--cuerpo); }
+.col-barra { width: 170px; }
+.num { text-align: right; }
+.tabla-ranking th.num { text-align: right; }
+.mono { font-family: var(--mono); }
+.fuerte { font-weight: 600; }
+.tenue { color: var(--gris); }
+.positivo { color: var(--positivo); }
+.negativo { color: var(--negativo); }
+.enlace-usuario { font-weight: 600; text-decoration: none; }
+.vacio { text-align: center; color: var(--gris); }
+
+.barra-evidencia {
+  height: 10px;
+  background: var(--barra-vacia);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.barra-evidencia div { height: 100%; background: var(--barra-neutra); border-radius: 999px; }
+.barra-evidencia div.significativa { background: var(--positivo); }
+
+.nota-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  font-size: 14px;
+  color: var(--gris);
+}
+.nota-pie p { margin: 0; max-width: 720px; }
+.nota-pie a { flex-shrink: 0; font-weight: 600; }
+
+/* ---------- Pantallas chicas (celulares) ---------- */
+@media (max-width: 800px) {
+  .barra { flex-wrap: wrap; padding: 0 16px; }
+  .barra-izq { gap: 16px; }
+  .marca { font-size: 26px; }
+  .nav a { padding: 0 10px; min-height: 56px; }
+  .barra-der { padding-bottom: 12px; }
+  .contenido { padding: 24px 16px 40px; }
+  h1 { font-size: 40px; }
+  .col-opcional { display: none; }
+  .tabla-ranking th:first-child, .tabla-ranking td:first-child { padding-left: 12px; }
+  .tabla-ranking th:last-child, .tabla-ranking td:last-child { padding-right: 12px; }
+  .nota-pie { flex-direction: column; gap: 12px; }
+}
+
+@media (max-width: 520px) {
+  .col-opcional-chica { display: none; }
+  .tabla-ranking td { font-size: 14px; }
+  .tabla-ranking th, .tabla-ranking td { padding-left: 6px; padding-right: 6px; }
+  .tabla-ranking td.col-pos { width: 36px; font-size: 20px; }
+}
+
+/* ============================================================
+   Elementos comunes (paso 3)
+   ============================================================ */
+[hidden] { display: none !important; }   /* "hidden" siempre gana sobre display: flex/grid */
+.pequeno { font-size: 13px; }
+.centro { text-align: center; }
+.derecha { text-align: right; }
+.relleno { padding: 24px; margin: 0; }
+.antetitulo {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gris);
+}
+
+.boton-barra {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--gris-oscuro);
+  background: transparent;
+  color: var(--fondo);
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton-barra:hover { border-color: var(--fondo); color: var(--blanco); }
+.barra-der form { margin: 0; }
+
+.boton-principal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 8px;
+  background: var(--texto);
+  color: var(--blanco);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton-principal:hover { background: #000; color: var(--blanco); }
+.boton-principal:disabled { background: #B9B4A8; cursor: not-allowed; }
+
+.mensajes { display: flex; flex-direction: column; gap: 8px; }
+.mensaje { padding: 12px 14px; border-radius: 8px; font-size: 14px; line-height: 1.4; }
+.mensaje-success { background: #E4EFE6; color: #1C4A2C; }
+.mensaje-error { background: #F6E1DE; color: #7E1A14; }
+
+/* ---------- Página de partidos ---------- */
+.layout-partidos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: start;
+}
+.lista-partidos { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.nota-lista { margin: 0; font-size: 14px; color: var(--gris); }
+.navegar-fechas { display: flex; gap: 16px; font-weight: 600; font-size: 14px; }
+
+.partido-fila {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 246px 164px;
+  grid-template-areas: "hora equipos x12 goles";
+  gap: 16px;
+  align-items: center;
+  padding: 14px 20px;
+}
+.partido-titulos {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gris);
+  background: var(--fondo-suave);
+  border-radius: 12px 12px 0 0;
+}
+.partido { border-top: 1px solid var(--linea); }
+.partido-hora { grid-area: hora; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.marcador { font-family: var(--mono); font-weight: 600; }
+.cerrado { color: var(--acento); font-weight: 600; }
+
+.partido-equipos {
+  grid-area: equipos;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 54px;
+  padding: 6px 8px;
+  margin-left: -8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+.partido-equipos:hover { background: var(--fondo-suave); }
+.partido-equipos[aria-expanded="true"] { background: #F3E3E1; }
+.ver-mas { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--acento); }
+.partido-equipos[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.grupo-cuotas { display: grid; gap: 6px; }
+.grupo-1x2 { grid-area: x12; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grupo-goles { grid-area: goles; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.cuota {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 54px;
+  padding: 0 4px;
+  border: 1px solid #CFC9BA;
+  border-radius: 8px;
+  background: var(--blanco);
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+}
+.cuota:hover:not(:disabled) { border-color: var(--texto); }
+.cuota-corto { font-size: 12px; font-weight: 600; color: var(--gris); }
+.cuota-valor { font-family: var(--mono); font-size: 17px; font-weight: 600; }
+.cuota[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--blanco); }
+.cuota[aria-pressed="true"] .cuota-corto { color: var(--blanco); }
+.cuota:disabled { cursor: not-allowed; background: var(--fondo-suave); color: var(--gris); }
+.cuota.ganadora { border: 2px solid var(--positivo); color: var(--positivo); background: #E4EFE6; }
+.cuota.ganadora .cuota-corto { color: var(--positivo); }
+
+.panel-mercados { padding: 4px 20px 20px; background: var(--fondo-suave); border-top: 1px solid var(--linea); }
+.panel-titulo {
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gris);
+}
+.grilla-mercados { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.mercado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+}
+.mercado-nombre { font-size: 14px; font-weight: 600; }
+.mercado .cuota { height: 50px; }
+.mercado .cuota-valor { font-size: 16px; }
+
+/* ---------- Boleta ---------- */
+.columna-boleta { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.boleta { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.boleta h2, .mis-apuestas h2 { margin: 0; font-family: var(--titulos); font-size: 28px; font-weight: 700; }
+.boleta-vacia { margin: 0; padding-bottom: 20px; border-bottom: 1px solid var(--linea); color: var(--gris); }
+.boleta-seleccion { display: flex; flex-direction: column; gap: 6px; padding-bottom: 20px; border-bottom: 1px solid var(--linea); }
+.boleta-partido { font-size: 16px; font-weight: 500; }
+.boleta-linea { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.boleta-etiqueta { font-size: 18px; font-weight: 600; }
+.boleta-cuota { font-family: var(--mono); font-size: 28px; font-weight: 600; color: var(--acento); }
+.boleta-unidades { display: flex; flex-direction: column; gap: 12px; }
+.contador { display: flex; align-items: center; gap: 12px; }
+.contador button {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid #CFC9BA;
+  background: var(--fondo-suave);
+  color: var(--texto);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.contador button:disabled { opacity: 0.4; cursor: not-allowed; }
+.contador output { flex-grow: 1; text-align: center; font-family: var(--mono); font-size: 34px; font-weight: 600; }
+.boleta input[type=range] { width: 100%; accent-color: var(--acento); }
+.boleta-resumen { display: flex; flex-direction: column; gap: 8px; }
+.boleta-resumen div { display: flex; justify-content: space-between; }
+.nota { margin: 0; font-size: 13px; line-height: 1.45; color: var(--gris); }
+
+.mis-apuestas { padding: 20px 24px; }
+.mis-apuestas h2 { font-size: 22px; }
+.mis-apuestas ul { list-style: none; margin: 12px 0 0; padding: 0; }
+.mis-apuestas li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--linea);
+  font-size: 14px;
+}
+
+.como-funciona { padding: 20px 24px; background: var(--fondo-pestanas); border-radius: 12px; }
+.como-funciona h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+.como-funciona p { margin: 0 0 10px; font-size: 14px; color: var(--gris-oscuro); }
+.como-funciona p:last-child { margin: 0; }
+
+.aviso-boleta {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--texto);
+  color: var(--blanco);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+}
+.aviso-boleta:hover { color: var(--blanco); }
+
+/* ---------- Formularios (entrar / crear cuenta) ---------- */
+.formulario { width: 100%; max-width: 440px; margin: 16px auto; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+.formulario h1 { font-size: 44px; }
+.formulario p { margin: 0; }
+.formulario form { display: flex; flex-direction: column; gap: 16px; }
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-weight: 600; font-size: 14px; }
+.campo input {
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid #CFC9BA;
+  border-radius: 8px;
+  font: inherit;
+  background: var(--blanco);
+}
+.campo input:focus { outline: 2px solid var(--acento); outline-offset: 1px; border-color: var(--acento); }
+.ayuda { font-size: 13px; color: var(--gris); }
+.ayuda ul { margin: 4px 0 0; padding-left: 18px; }
+.error { font-size: 13px; color: var(--negativo); font-weight: 600; }
+
+/* ---------- Partidos en pantallas medianas y chicas ---------- */
+@media (max-width: 1000px) {
+  .layout-partidos { grid-template-columns: minmax(0, 1fr); }
+  .columna-boleta { position: static; }
+  .contenido:has(.aviso-boleta) { padding-bottom: 96px; }
+}
+@media (max-width: 700px) {
+  .partido-titulos { display: none; }
+  .partido-fila {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-areas: "hora hora" "equipos equipos" "x12 goles";
+    gap: 8px;
+    padding: 14px 12px;
+  }
+  .partido-hora { flex-direction: row; gap: 8px; }
+  .partido-equipos { min-height: 0; }
+  .cuota { height: 50px; }
+  .cuota-valor { font-size: 15px; }
+  .panel-mercados { padding: 4px 12px 16px; }
+  .grilla-mercados { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ============================================================
+   Mis apuestas (y últimas apuestas del perfil)
+   ============================================================ */
+.resumen { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; font-size: 14px; }
+.resumen-dato { display: flex; align-items: baseline; gap: 8px; }
+.resumen-dato .mono { font-size: 20px; font-weight: 600; }
+.resumen a { margin-left: auto; }
+
+.lista-grupos { overflow: hidden; }
+.grupo + .grupo { border-top: 1px solid var(--linea); }
+.grupo-cabecera > div:last-child, .fila-apuesta > div { white-space: nowrap; }
+.fila-apuesta > .fila-apuesta-opcion { white-space: normal; }
+.grupo-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  background: var(--fondo-suave);
+  font-size: 14px;
+}
+.fila-apuesta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px 56px 80px 100px;
+  gap: 16px;
+  align-items: center;
+  min-height: 56px;
+  padding: 8px 24px;
+  border-top: 1px solid var(--barra-vacia);
+}
+.paginacion { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-weight: 600; font-size: 14px; }
+
+@media (max-width: 800px) {
+  /* Celular: fila 1 = nombre + usuario; fila 2 = pestañas (se deslizan si no caben) */
+  .barra { padding-top: 10px; row-gap: 4px; }
+  .barra-izq { display: contents; }
+  .marca { order: 1; }
+  .barra-der { order: 2; padding-bottom: 0; gap: 12px; }
+  .nav { order: 3; flex-basis: 100%; overflow-x: auto; scrollbar-width: none; margin: 0 -10px; }
+  .nav a { white-space: nowrap; min-height: 48px; }
+  .etiqueta-ejemplo { display: none; }
+}
+@media (max-width: 600px) {
+  .grupo-cabecera { padding: 10px 12px; }
+  .fila-apuesta {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: "opcion cuota unidades" "opcion estado ganancia";
+    gap: 4px 12px;
+    padding: 10px 12px;
+  }
+  .fila-apuesta > :nth-child(1) { grid-area: opcion; }
+  .fila-apuesta > :nth-child(2) { grid-area: cuota; }
+  .fila-apuesta > :nth-child(3) { grid-area: unidades; }
+  .fila-apuesta > :nth-child(4) { grid-area: estado; }
+  .fila-apuesta > :nth-child(5) { grid-area: ganancia; }
+  .resumen { gap: 16px; }
+  .resumen a { margin-left: 0; }
+}
+
+/* ============================================================
+   Perfil público
+   ============================================================ */
+.perfil-cabecera { display: flex; align-items: center; gap: 20px; }
+.avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: var(--acento);
+  color: var(--blanco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--titulos);
+  font-size: 30px;
+  font-weight: 700;
+}
+.perfil-nombre { font-size: 44px; overflow-wrap: anywhere; }
+
+.perfil-resumen { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; }
+.evidencia {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  border-radius: 12px;
+  background: var(--texto);
+  color: var(--fondo);
+}
+.evidencia h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nav-inactivo);
+}
+.evidencia-numeros { display: flex; gap: 40px; }
+.evidencia-etiqueta { font-size: 14px; color: var(--nav-inactivo); }
+.evidencia-valor { font-family: var(--mono); font-size: 48px; font-weight: 600; line-height: 1.1; }
+.evidencia-valor.significativo { color: #8FCB9B; }
+.evidencia p { margin: 0; color: #E4E0D6; }
+.evidencia .evidencia-aviso { font-size: 14px; padding-top: 14px; border-top: 1px solid var(--gris-oscuro); color: var(--amarillo); }
+
+.grilla-datos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dato {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+.dato-etiqueta { font-size: 13px; font-weight: 600; color: var(--gris); }
+.dato-valor { font-family: var(--mono); font-size: 30px; font-weight: 600; line-height: 1.2; }
+.dato-ayuda { font-size: 13px; line-height: 1.4; color: var(--gris); }
+
+.seccion-perfil { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+.seccion-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.lista-grupos .seccion-cabecera { padding: 20px 24px 12px; }
+.seccion-cabecera h2 { margin: 0; font-family: var(--titulos); font-size: 26px; font-weight: 700; }
+
+/* Gráfico: el SVG se estira; los textos van en HTML para que no se deformen */
+.grafico { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: 220px auto; column-gap: 12px; }
+.grafico-eje { position: relative; }
+.grafico-eje span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--gris);
+}
+.grafico-area { position: relative; outline-offset: 4px; cursor: crosshair; touch-action: pan-y; }
+.grafico-area:focus-visible { outline: 2px solid var(--acento); }
+.grafico-area svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.grafico-rejilla { stroke: var(--barra-vacia); stroke-width: 1; }
+.grafico-cero { stroke: var(--barra-neutra); stroke-width: 1; }
+.grafico-linea { fill: none; stroke: var(--positivo); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.grafico-linea.negativa { stroke: var(--negativo); }
+.grafico-punto-final, .grafico-punto {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--positivo);
+  box-shadow: 0 0 0 2px var(--blanco);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.grafico-punto-final.negativa { background: var(--negativo); }
+.grafico-punto { background: var(--texto); }
+.grafico-total { font-size: 15px; color: var(--texto); }
+.grafico-cruz { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gris); pointer-events: none; }
+.grafico-tooltip {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  min-width: 180px;
+  max-width: 260px;
+  margin-left: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--blanco);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.grafico-tooltip.a-la-izquierda { transform: translateX(calc(-100% - 24px)); }
+.tooltip-valor { font-family: var(--mono); font-size: 15px; font-weight: 600; }
+.grafico-pie { grid-column: 2; display: flex; justify-content: space-between; padding-top: 6px; }
+
+.tabla-datos summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--acento); }
+.tabla-datos .tabla-contenedor { max-height: 320px; overflow: auto; margin-top: 12px; }
+.tabla-datos table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tabla-datos th { position: sticky; top: 0; background: var(--fondo-suave); text-align: left; padding: 8px; font-size: 12px; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; }
+.tabla-datos td { padding: 6px 8px; border-top: 1px solid var(--linea); }
+
+@media (max-width: 1100px) {
+  .perfil-resumen { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .grilla-datos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dato { padding: 14px; }
+  .dato-valor { font-size: 24px; }
+  .evidencia { padding: 22px; }
+  .evidencia-valor { font-size: 40px; }
+  .avatar { width: 56px; height: 56px; font-size: 24px; }
+  .perfil-nombre { font-size: 34px; }
+  .seccion-perfil { padding: 16px; }
+  .lista-grupos .seccion-cabecera { padding: 16px 12px 10px; }
+  .grafico { grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: 180px auto; column-gap: 8px; }
+}
