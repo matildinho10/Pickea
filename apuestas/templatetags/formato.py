@@ -63,10 +63,3 @@ def tono(valor):
         return ''
     return 'positivo' if valor > 0 else 'negativo'
 
-
-@register.filter
-def ancho_barra(z, z_maximo=4):
-    """Largo de la barra de evidencia en %, según z (0 si es negativo)."""
-    if z is None:
-        return 0
-    return round(min(max(z, 0) / z_maximo, 1) * 100)

@@ -177,7 +177,6 @@ h1 {
 
 .col-pos { width: 48px; font-family: var(--titulos); font-size: 24px; font-weight: 700; }
 th.col-pos { font-family: var(--cuerpo); }
-.col-barra { width: 170px; }
 .num { text-align: right; }
 .tabla-ranking th.num { text-align: right; }
 .mono { font-family: var(--mono); }
@@ -188,14 +187,6 @@ th.col-pos { font-family: var(--cuerpo); }
 .enlace-usuario { font-weight: 600; text-decoration: none; }
 .vacio { text-align: center; color: var(--gris); }
 
-.barra-evidencia {
-  height: 10px;
-  background: var(--barra-vacia);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.barra-evidencia div { height: 100%; background: var(--barra-neutra); border-radius: 999px; }
-.barra-evidencia div.significativa { background: var(--positivo); }
 
 .nota-pie {
   display: flex;

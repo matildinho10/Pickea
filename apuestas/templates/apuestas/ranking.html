@@ -7,7 +7,7 @@
 <div class="encabezado">
   <div class="encabezado-texto">
     <h1>Ranking</h1>
-    <p>Ordenado por z: qué tan difícil es explicar el resultado de cada usuario solo con suerte.
+    <p>Ordenado por p-valor: qué tan difícil es explicar el resultado de cada usuario solo con suerte.
        Un ROI alto con pocas apuestas no basta para subir.</p>
   </div>
   {% if temporada %}
@@ -23,7 +23,7 @@
 <div class="nota-pie">
   <p>Para entrar al ranking se necesitan al menos {{ minimo }} partidos efectivos.
      El p-valor es la probabilidad de lograr un resultado igual o mejor por pura suerte,
-     apostando sin ventaja sobre las cuotas. Barra verde: p-valor menor a 0.05.</p>
+     apostando sin ventaja sobre las cuotas. Mientras más bajo, más evidencia de habilidad; en verde, menor a 0.05.</p>
   {% if bajo_minimo %}
     {% if ver_bajo_minimo %}
       <a href="?periodo={{ periodo }}">Ocultar usuarios bajo el mínimo</a>

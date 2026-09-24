@@ -178,13 +178,10 @@ class PaginasTests(TestCase):
 
 class FormatoTests(TestCase):
     def test_filtros(self):
-        from .templatetags.formato import ancho_barra, con_signo, porcentaje, pvalor
+        from .templatetags.formato import con_signo, porcentaje, pvalor
         self.assertEqual(con_signo(12.345), '+12.3')
         self.assertEqual(con_signo(-4, 2), '−4.00')
         self.assertEqual(con_signo(0.01), '0.0')
         self.assertEqual(porcentaje(0.078), '+7.8%')
         self.assertEqual(pvalor(0.0004), '<0.001')
         self.assertEqual(pvalor(0.1234), '0.123')
-        self.assertEqual(ancho_barra(-1), 0)
-        self.assertEqual(ancho_barra(2), 50)
-        self.assertEqual(ancho_barra(9), 100)
